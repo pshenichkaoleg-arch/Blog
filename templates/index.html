@@ -1,7 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Главная{% endblock %}
+{% block title %}Главная - TWO POLES{% endblock %}
 {% block content %}
-    <h1 class="mb-4">Последние посты</h1>
+    <h1 class="mb-4">Добро пожаловать в TWO POLES!</h1>
+    <p class="lead">Say "yes" to the gastronomic art. Сеть уютных ресторанов в Краснодаре. Непревзойдённая атмосфера, сочные блюда от шефа, живая музыка каждый вечер.</p>
+    <hr>
+    <h2>Последние новости и события</h2>
     {% for post in posts %}
         <div class="card mb-3">
             <div class="card-body">
@@ -11,9 +14,12 @@
                 <h6 class="card-subtitle mb-2 text-muted">{{ post.date_posted.strftime('%d.%m.%Y %H:%M') }}</h6>
                 <p class="card-text">{{ post.content[:200] }}...</p>
                 <a href="{{ url_for('post', post_id=post.id) }}" class="btn btn-primary btn-sm">Читать далее</a>
+                {% if post.author %}
+                    <span class="badge bg-secondary">Автор: {{ post.author.username }}</span>
+                {% endif %}
             </div>
         </div>
     {% else %}
-        <p>Пока нет ни одного поста. <a href="{{ url_for('create') }}">Напишите первый!</a></p>
+        <p>Пока нет новостей. <a href="{{ url_for('create') }}">Добавьте первую!</a></p>
     {% endfor %}
 {% endblock %}

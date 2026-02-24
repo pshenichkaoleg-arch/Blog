@@ -8,7 +8,11 @@
         </ol>
     </nav>
     <h1>{{ post.title }}</h1>
-    <p class="text-muted">{{ post.date_posted.strftime('%d.%m.%Y %H:%M') }}</p>
+    <p class="text-muted">{{ post.date_posted.strftime('%d.%m.%Y %H:%M') }}
+        {% if post.author %}
+            | Автор: {{ post.author.username }}
+        {% endif %}
+    </p>
     <div class="mt-4">
         {{ post.content | safe }}
     </div>

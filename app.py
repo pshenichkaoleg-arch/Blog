@@ -16,7 +16,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Конфигурация - ИСПРАВЛЕНО!
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key-change-in-production')
+app.config['oX5P1wtDAZKtvYZz7dzRI8sm'] = os.getenv('oX5P1wtDAZKtvYZz7dzRI8sm', 'default-secret-key-change-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///blog.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

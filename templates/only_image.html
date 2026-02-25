@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Главная</title>
+    <style>
+        /* Полностью убираем все отступы */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;  /* отключаем прокрутку */
+        }
+        
+        /* Контейнер для изображения и кнопок */
+        .fullscreen-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Изображение на весь экран */
+        .fullscreen-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;  /* заполняет весь экран */
+            display: block;
+        }
+        
+        /* Общий стиль для всех кнопок */
+        .image-button {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);  /* полупрозрачный белый */
+            color: black;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            border: 2px solid white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .image-button:hover {
+            background-color: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+        
+        /* Позиции кнопок (подберите под своё изображение) */
+        .button-1 {
+            top: 5%;     /* расстояние от верхнего края */
+            left: 60%;    /* расстояние от левого края */
+        }
+        
+        .button-2 {
+            top: 5%;
+            left: 65%;
+                    }
+        
+        .button-3 {
+            top: 5%;
+            left: 83%;
+                    }
+        
+        .button-4 {
+            top: 5%;
+            right: 20%;
+        }
+        
+        /* Для мобильных устройств */
+        @media (max-width: 768px) {
+            .image-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="fullscreen-container">
+        <!-- Изображение -->
+        <img src="{{ url_for('static', filename='images/main.png') }}" 
+             alt="Главное изображение" 
+             class="fullscreen-image">
+        
+        <!-- Кнопки (настройте текст и ссылки) -->
+        <a href="{{ url_for('design_gallery') }}" class="image-button button-1">ЦЕНЫ</a>
+        <a href="https://instagram.com" target="_blank" class="image-button button-2">ПРИМЕРЫ РАБОТ</a>
+        <a href="/about" class="image-button button-3">ПОДДЕРЖКА</a>
+        <a href="/booking" class="image-button button-4">ЛИЧНЫЙ КАБИНЕТ</a>
+    </div>
+</body>
+</html>

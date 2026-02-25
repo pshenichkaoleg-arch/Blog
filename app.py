@@ -15,8 +15,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Конфигурация
-app.config['e3bfdeb772dd100a06e44dec4301d516'] = os.getenv('SECRET_KEY', 'default-secret-key-change-in-production')
+# Конфигурация - ИСПРАВЛЕНО!
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key-change-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///blog.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -25,10 +25,10 @@ db = SQLAlchemy(app)
 # Инициализация Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'          # если не залогинен, редирект на login
+login_manager.login_view = 'login'
 login_manager.login_message = 'Пожалуйста, войдите, чтобы увидеть эту страницу.'
 
-# Инициализация Flask-Migrate (для будущих миграций)
+# Инициализация Flask-Migrate
 migrate = Migrate(app, db)
 
 # ----------------------------------------------------------------------
@@ -41,8 +41,6 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Связь с постами (если посты привязаны к пользователям)
     posts = db.relationship('Post', backref='author', lazy=True)
 
     def set_password(self, password):
@@ -60,7 +58,6 @@ class Post(db.Model):
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
-    # Внешний ключ на пользователя (может быть NULL, пока не привязываем)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
     def __repr__(self):
@@ -68,13 +65,11 @@ class Post(db.Model):
 
 
 class UserLog(db.Model):
-    """Модель для сбора статистики действий пользователей"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    action = db.Column(db.String(100), nullable=False)   # например, 'login', 'create_post'
+    action = db.Column(db.String(100), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    details = db.Column(db.Text, nullable=True)          # дополнительная информация
-
+    details = db.Column(db.Text, nullable=True)
     user = db.relationship('User', backref='logs')
 
     def __repr__(self):
@@ -82,7 +77,7 @@ class UserLog(db.Model):
 
 
 # ----------------------------------------------------------------------
-# ЗАГРУЗЧИК ПОЛЬЗОВАТЕЛЯ ДЛЯ FLASK-LOGIN
+# ЗАГРУЗЧИК ПОЛЬЗОВАТЕЛЯ
 # ----------------------------------------------------------------------
 @login_manager.user_loader
 def load_user(user_id):
@@ -107,10 +102,9 @@ class LoginForm(FlaskForm):
 
 
 # ----------------------------------------------------------------------
-# ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ЛОГИРОВАНИЯ ДЕЙСТВИЙ
+# ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ЛОГИРОВАНИЯ
 # ----------------------------------------------------------------------
 def log_user_action(user, action, details=None):
-    """Сохраняет действие пользователя в базу данных (статистика)."""
     log = UserLog(user_id=user.id if user else None, action=action, details=details)
     db.session.add(log)
     db.session.commit()
@@ -122,9 +116,20 @@ def log_user_action(user, action, details=None):
 
 @app.route('/')
 def index():
-    """Главная страница со списком постов"""
-    posts = Post.query.order_by(Post.date_posted.desc()).all()
-    return render_template('index.html', posts=posts)
+    """Главная страница - только изображение"""
+    return render_template('only_image.html')
+
+
+@app.route('/about')
+def about():
+    """Страница о ресторане"""
+    return render_template('about.html')
+
+
+@app.route('/design')
+def design_gallery():
+    """Галерея дизайна и цен"""
+    return render_template('design_gallery.html')
 
 
 @app.route('/post/<int:post_id>')
@@ -144,19 +149,10 @@ def create():
         new_post = Post(title=title, content=content, user_id=current_user.id)
         db.session.add(new_post)
         db.session.commit()
-
-        # Логируем действие
         log_user_action(current_user, 'create_post', f'Post id: {new_post.id}')
-
         flash('Пост успешно создан!', 'success')
         return redirect(url_for('index'))
     return render_template('create.html')
-
-
-@app.route('/about')
-def about():
-    """Страница «О сайте» (можно адаптировать под ресторан)"""
-    return render_template('about.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -167,7 +163,6 @@ def register():
 
     form = RegistrationForm()
     if form.validate_on_submit():
-        # Проверка уникальности имени и email
         if User.query.filter_by(username=form.username.data).first():
             flash('Имя пользователя уже занято.', 'danger')
             return render_template('register.html', form=form)
@@ -179,10 +174,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-
-        # Логируем регистрацию
         log_user_action(user, 'register')
-
         flash('Регистрация прошла успешно! Теперь вы можете войти.', 'success')
         return redirect(url_for('login'))
 
@@ -200,9 +192,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            # Логируем вход
             log_user_action(user, 'login')
-
             flash('Вы успешно вошли в систему.', 'success')
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('index'))
@@ -231,12 +221,10 @@ def page_not_found(e):
 
 
 # ----------------------------------------------------------------------
-# СОЗДАНИЕ ТАБЛИЦ ПРИ ЗАПУСКЕ (ДЛЯ SQLite И ПЕРВОГО РАЗА)
+# СОЗДАНИЕ ТАБЛИЦ ПРИ ЗАПУСКЕ
 # ----------------------------------------------------------------------
 with app.app_context():
-    db.create_all()  # создаст таблицы, если их нет (для SQLite)
-    # Для PostgreSQL в Railway это тоже сработает, но если понадобятся миграции, 
-    # лучше использовать flask db upgrade. Пока оставим так.
+    db.create_all()
 
 
 # ----------------------------------------------------------------------

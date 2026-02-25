@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Дизайн и цены{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-5">Дизайн и цены</h1>
+    
+    <div class="row">
+        <!-- Карточка 1 -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Дизайн 1</h5>
+                    <p class="card-text">Интерьер зала</p>
+                    <p class="text-success fw-bold">Средний чек: 2500 ₽</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Карточка 2 -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Дизайн 2</h5>
+                    <p class="card-text">VIP-комната</p>
+                    <p class="text-success fw-bold">Мин. заказ: 5000 ₽</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Карточка 3 -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Дизайн 3</h5>
+                    <p class="card-text">Летняя веранда</p>
+                    <p class="text-success fw-bold">Средний чек: 2000 ₽</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Таблица с ценами -->
+    <h2 class="mt-5 mb-4">Прайс-лист</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Услуга</th>
+                <th>Цена</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Бизнес-ланч</td>
+                <td>350 ₽</td>
+            </tr>
+            <tr>
+                <td>Ужин на двоих</td>
+                <td>2500 ₽</td>
+            </tr>
+            <tr>
+                <td>Банкет (до 10 чел)</td>
+                <td>15 000 ₽</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">На главную</a>
+    </div>
+</div>
+{% endblock %}

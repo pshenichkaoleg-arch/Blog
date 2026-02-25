@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #000; /* или любой другой фон */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .full-image {
+            width: 100%;
+            height: 100vh;
+            object-fit: contain; /* сохраняет пропорции, вписывая в экран */
+            display: block;
+        }
+        /* Альтернатива - если хотите чтобы изображение занимало весь экран без полей */
+        .full-image-cover {
+            width: 100%;
+            height: 100vh;
+            object-fit: cover; /* обрезает изображение, чтобы заполнить экран */
+        }
+    </style>
+</head>
+<body>
+    <img src="{{ url_for('static', filename='images/ваш_файл.png') }}" 
+         alt="Главное изображение" 
+         class="full-image"
+         usemap="#image-map">
+
+    <!-- Если нужны кликабельные области, добавьте карту -->
+    <map name="image-map">
+        <!-- Пример области:
+        <area shape="rect" coords="100,100,300,200" 
+              href="{{ url_for('design_gallery') }}" 
+              alt="Дизайн и цены">
+        -->
+    </map>
+</body>
+</html>

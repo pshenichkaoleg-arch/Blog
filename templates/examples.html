@@ -1,38 +1,179 @@
 {% extends "base.html" %}
 {% block title %}Примеры работ{% endblock %}
+
+{% block styles %}
+<style>
+    .works-container {
+        padding: 20px 0;
+    }
+    
+    .work-card {
+        position: relative;
+        height: 400px;
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .work-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    
+    .work-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        transition: transform 0.5s ease;
+    }
+    
+    .work-card:hover .work-image {
+        transform: scale(1.1);
+    }
+    
+    .work-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 30px;
+        color: white;
+        z-index: 2;
+    }
+    
+    .work-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .work-description {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 15px;
+        max-width: 80%;
+    }
+    
+    .work-price {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ffd700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .work-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255,255,255,0.9);
+        color: #333;
+        padding: 8px 15px;
+        border-radius: 25px;
+        font-weight: bold;
+        z-index: 3;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    /* Для мобильных устройств */
+    @media (max-width: 768px) {
+        .work-card {
+            height: 300px;
+        }
+        .work-title {
+            font-size: 22px;
+        }
+        .work-description {
+            font-size: 14px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1 class="text-center mb-5">Примеры наших работ</h1>
+<div class="container works-container">
+    <h1 class="text-center mb-5">Наши работы</h1>
     
     <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Работа 1</h5>
-                    <p class="card-text">Описание работы 1</p>
+        <!-- Работа 1 -->
+        <div class="col-md-6">
+            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work1.jpg') }}');"></div>
+                <div class="work-overlay">
+                    <div class="work-title">Дизайн интерьера</div>
+                    <div class="work-description">Современный стиль с элементами лофта</div>
+                    <div class="work-price">от 2500 ₽/м²</div>
                 </div>
+                <div class="work-badge">Хит</div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Работа 2</h5>
-                    <p class="card-text">Описание работы 2</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Работа 3</h5>
-                    <p class="card-text">Описание работы 3</p>
+        
+        <!-- Работа 2 -->
+        <div class="col-md-6">
+            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work2.jpg') }}');"></div>
+                <div class="work-overlay">
+                    <div class="work-title">Кухня-гостиная</div>
+                    <div class="work-description">Объединение пространства в стиле минимализм</div>
+                    <div class="work-price">от 3000 ₽/м²</div>
                 </div>
             </div>
         </div>
     </div>
     
+    <div class="row">
+        <!-- Работа 3 -->
+        <div class="col-md-4">
+            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work3.jpg') }}');"></div>
+                <div class="work-overlay">
+                    <div class="work-title">Спальня</div>
+                    <div class="work-description">Уютная спальня в скандинавском стиле</div>
+                    <div class="work-price">от 2000 ₽/м²</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Работа 4 -->
+        <div class="col-md-4">
+            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work4.jpg') }}');"></div>
+                <div class="work-overlay">
+                    <div class="work-title">Ванная комната</div>
+                    <div class="work-description">Роскошный дизайн с мраморной отделкой</div>
+                    <div class="work-price">от 2800 ₽/м²</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Работа 5 -->
+        <div class="col-md-4">
+            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work5.jpg') }}');"></div>
+                <div class="work-overlay">
+                    <div class="work-title">Офисное пространство</div>
+                    <div class="work-description">Современный офис open space</div>
+                    <div class="work-price">от 2200 ₽/м²</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Кнопка "Смотреть все" (опционально) -->
     <div class="text-center mt-4">
-        <a href="{{ url_for('index') }}" class="btn btn-primary">Вернуться на главную</a>
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">На главную</a>
     </div>
 </div>
 {% endblock %}

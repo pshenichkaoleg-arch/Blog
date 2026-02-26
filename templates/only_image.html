@@ -15,7 +15,8 @@
         html, body {
             width: 100%;
             height: 100%;
-            overflow: hidden;  /* отключаем прокрутку */
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         /* Контейнер для изображения и кнопок */
@@ -29,35 +30,139 @@
         .fullscreen-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;  /* заполняет весь экран */
+            object-fit: cover;
             display: block;
+        }
+        
+        /* Затемнение поверх изображения для лучшей читаемости текста */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4); /* полупрозрачное затемнение */
+            z-index: 1;
+        }
+        
+        /* Контейнер для текста */
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 2;
+            width: 80%;
+            max-width: 800px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            animation: fadeInDown 1s ease;
+        }
+        
+        .hero-subtitle {
+            font-size: 24px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+        
+        .hero-description {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.85;
+            animation: fadeIn 1s ease 0.6s both;
+        }
+        
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            animation: fadeIn 1s ease 0.9s both;
+        }
+        
+        .feature-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        /* Анимации */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         /* Общий стиль для всех кнопок */
         .image-button {
             position: absolute;
-            background-color: rgba(255, 255, 255, 0.8);  /* полупрозрачный белый */
-            color: black;
-            padding: 15px 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 12px 25px;
             border-radius: 50px;
             text-decoration: none;
-            font-weight: bold;
-            font-size: 18px;
+            font-weight: 600;
+            font-size: 16px;
             border: 2px solid white;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 3;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .image-button:hover {
             background-color: white;
-            transform: scale(1.05);
+            transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            color: #000;
         }
         
-        /* Позиции кнопок (подберите под своё изображение) */
+        /* Позиции кнопок (настройте под ваше изображение) */
         .button-1 {
-            top: 5%;     /* расстояние от верхнего края */
-            left: 60%;    /* расстояние от левого края */
+            top: 5%;
+            left: 60%;
         }
         
         .button-2 {
@@ -77,9 +182,22 @@
         
         /* Для мобильных устройств */
         @media (max-width: 768px) {
-            .image-button {
-                padding: 10px 20px;
+            .hero-title {
+                font-size: 32px;
+            }
+            .hero-subtitle {
+                font-size: 18px;
+            }
+            .hero-description {
                 font-size: 14px;
+            }
+            .feature-item {
+                padding: 8px 15px;
+                font-size: 12px;
+            }
+            .image-button {
+                padding: 8px 15px;
+                font-size: 12px;
             }
         }
     </style>
@@ -91,7 +209,28 @@
              alt="Главное изображение" 
              class="fullscreen-image">
         
-        <!-- Кнопки с правильными ссылками -->
+        <!-- Затемняющий слой -->
+        <div class="overlay"></div>
+        
+        <!-- Текстовый блок с описанием -->
+        <div class="hero-content">
+            <h1 class="hero-title">СОЗДАНИЕ БОТОВ</h1>
+            <p class="hero-subtitle">Автоматизация без границ</p>
+            <p class="hero-description">
+                Разрабатываем интеллектуальных ботов для бизнеса и развлечений.<br>
+                Telegram, Discord, WhatsApp — любые платформы под ваши задачи.
+            </p>
+            
+            <div class="features">
+                <span class="feature-item">🤖 ИИ-ассистенты</span>
+                <span class="feature-item">💰 Оплата внутри ботов</span>
+                <span class="feature-item">📊 Аналитика</span>
+                <span class="feature-item">🚀 24/7 поддержка</span>
+                <span class="feature-item">⚡ Быстрый старт</span>
+            </div>
+        </div>
+        
+        <!-- Кнопки (оставляем как есть) -->
         <a href="{{ url_for('price') }}" class="image-button button-1">ЦЕНЫ</a>
         <a href="{{ url_for('examples') }}" class="image-button button-2">ПРИМЕРЫ РАБОТ</a>
         <a href="{{ url_for('support') }}" class="image-button button-3">ПОДДЕРЖКА</a>

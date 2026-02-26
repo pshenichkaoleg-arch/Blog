@@ -2,10 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Главная</title>
     <style>
-        /* Полностью убираем все отступы */
         * {
             margin: 0;
             padding: 0;
@@ -14,19 +13,19 @@
         
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            scroll-behavior: smooth;
         }
         
-        /* Контейнер для изображения и кнопок */
-        .fullscreen-container {
-            width: 100vw;
-            height: 100vh;
+        /* Верхняя часть с изображением */
+        .hero-section {
             position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
         }
         
-        /* Изображение на весь экран */
         .fullscreen-image {
             width: 100%;
             height: 100%;
@@ -34,18 +33,34 @@
             display: block;
         }
         
-        /* Затемнение поверх изображения для лучшей читаемости текста */
         .overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4); /* полупрозрачное затемнение */
+            background: rgba(0, 0, 0, 0.4);
             z-index: 1;
         }
         
-        /* Контейнер для текста */
+        /* Логотип */
+        .logo {
+            position: absolute;
+            top: 60px;
+            left: 90px;
+            z-index: 3;
+            max-width: 200px;
+        }
+        
+        .logo img {
+            width: 150%;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+        
+        /* Текст на изображении */
         .hero-content {
             position: absolute;
             top: 50%;
@@ -54,13 +69,13 @@
             text-align: center;
             color: white;
             z-index: 2;
-            width: 80%;
-            max-width: 800px;
+            width: 90%;
+            max-width: 1200px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         
         .hero-title {
-            font-size: 48px;
+            font-size: clamp(32px, 6vw, 72px);
             font-weight: 800;
             margin-bottom: 20px;
             letter-spacing: 2px;
@@ -68,42 +83,266 @@
         }
         
         .hero-subtitle {
-            font-size: 24px;
+            font-size: clamp(18px, 3vw, 32px);
             margin-bottom: 30px;
             opacity: 0.9;
             animation: fadeInUp 1s ease 0.3s both;
         }
         
         .hero-description {
-            font-size: 18px;
+            font-size: clamp(16px, 2.2vw, 22px);
             line-height: 1.6;
             margin-bottom: 40px;
             opacity: 0.85;
             animation: fadeIn 1s ease 0.6s both;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
-        .features {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 40px;
-            flex-wrap: wrap;
-            animation: fadeIn 1s ease 0.9s both;
-        }
-        
-        .feature-item {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(5px);
-            padding: 15px 25px;
+        /* Кнопки на изображении */
+        .image-button {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 25px 35px;
             border-radius: 50px;
-            font-weight: 500;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            border: 2px solid white;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 3;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        .feature-item:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-5px);
+        .image-button:hover {
+            background-color: white;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            color: #000;
+        }
+        
+        /* Позиции кнопок (настройте под ваше изображение) */
+        .button-support {
+            top: 5%;
+            right: 12%;
+        }
+        
+        .button-login {
+            top: 5%;
+            right: 5%;
+        }
+        
+        .button-register {
+            top: 5%;
+            right: 5%;
+        }
+        
+        /* Кнопка для скролла вниз */
+        .scroll-down {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: white;
+            font-size: 14px;
+            text-decoration: none;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .scroll-down:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-20px); }
+            60% { transform: translateX(-50%) translateY(-10px); }
+        }
+        
+        /* ===== ПРОКРУЧИВАЕМАЯ ЧАСТЬ ===== */
+        .content-section {
+            width: 100%;
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: clamp(28px, 5vw, 48px);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: clamp(16px, 2vw, 20px);
+            margin-bottom: 60px;
+            opacity: 0.9;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Сетка карточек */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .card-price {
+            font-size: 36px;
+            font-weight: 800;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .card-price small {
+            font-size: 16px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .card-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .card-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 16px;
+        }
+        
+        .card-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .card-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: white;
+            color: #333;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .card-button:hover {
+            background: transparent;
+            color: white;
+            border-color: white;
+        }
+        
+        /* Примеры работ */
+        .examples-section {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+        
+        .examples-title {
+            text-align: center;
+            font-size: clamp(28px, 5vw, 48px);
+            color: #333;
+            margin-bottom: 40px;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .example-card {
+            position: relative;
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .example-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .example-card:hover .example-image {
+            transform: scale(1.1);
+        }
+        
+        .example-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+            color: white;
+        }
+        
+        .example-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .example-description {
+            font-size: 14px;
+            opacity: 0.9;
         }
         
         /* Анимации */
@@ -134,85 +373,61 @@
             to { opacity: 1; }
         }
         
-        /* Общий стиль для всех кнопок */
-        .image-button {
-            position: absolute;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #333;
-            padding: 12px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            border: 2px solid white;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 3;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .image-button:hover {
-            background-color: white;
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-            color: #000;
-        }
-        
-        /* Позиции кнопок (настройте под ваше изображение) */
-        .button-1 {
-            top: 9%;
-            left: 60%;
-        }
-        
-        .button-2 {
-            top: 5%;
-            left: 65%;
-        }
-        
-        .button-3 {
-            top: 5%;
-            left: 83%;
-        }
-        
-        .button-4 {
-            top: 5%;
-            right: 20%;
-        }
-        
-        /* Для мобильных устройств */
+        /* Адаптация */
         @media (max-width: 768px) {
+            .logo {
+                top: 20px;
+                left: 20px;
+                max-width: 150px;
+            }
+            
             .hero-title {
                 font-size: 32px;
             }
+            
             .hero-subtitle {
                 font-size: 18px;
             }
-            .hero-description {
-                font-size: 14px;
-            }
-            .feature-item {
-                padding: 8px 15px;
-                font-size: 12px;
-            }
+            
             .image-button {
                 padding: 8px 15px;
                 font-size: 12px;
+            }
+            
+            .button-support {
+                top: 5%;
+                right: 10%;
+            }
+            
+            .button-login, .button-register {
+                top: 5%;
+                right: 5%;
+            }
+            
+            .card {
+                padding: 30px 20px;
+            }
+            
+            .card-price {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="fullscreen-container">
-        <!-- Изображение -->
+    <!-- Верхняя часть с изображением -->
+    <div class="hero-section">
         <img src="{{ url_for('static', filename='images/main.png') }}" 
              alt="Главное изображение" 
              class="fullscreen-image">
         
-        <!-- Затемняющий слой -->
         <div class="overlay"></div>
         
-        <!-- Текстовый блок с описанием -->
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" 
+                 alt="Логотип">
+        </div>
+        
         <div class="hero-content">
             <h1 class="hero-title">СОЗДАНИЕ БОТОВ</h1>
             <p class="hero-subtitle">Автоматизация без границ</p>
@@ -220,21 +435,114 @@
                 Разрабатываем интеллектуальных ботов для бизнеса и развлечений.<br>
                 Telegram, Discord, WhatsApp — любые платформы под ваши задачи.
             </p>
+        </div>
+        
+        <!-- Кнопки на изображении (только нужные) -->
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('personal_account') }}" class="image-button button-login">ЛИЧНЫЙ КАБИНЕТ</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="image-button button-login">ВОЙТИ</a>
+            <a href="{{ url_for('register') }}" class="image-button button-register">РЕГИСТРАЦИЯ</a>
+        {% endif %}
+        
+        <a href="{{ url_for('support') }}" class="image-button button-support">ПОДДЕРЖКА</a>
+        
+        <!-- Кнопка для скролла вниз -->
+        <a href="#content" class="scroll-down">▼ Прокрутите вниз ▼</a>
+    </div>
+
+    <!-- Прокручиваемая часть с контентом -->
+    <div id="content">
+        <!-- Блок с ценами и возможностями (три карточки) -->
+        <div class="content-section">
+            <h2 class="section-title">Тарифы и возможности</h2>
+            <p class="section-subtitle">Выберите подходящий план для вашего бизнеса</p>
             
-            <div class="features">
-                <span class="feature-item">🤖 ИИ-ассистенты</span>
-                <span class="feature-item">💰 Оплата внутри ботов</span>
-                <span class="feature-item">📊 Аналитика</span>
-                <span class="feature-item">🚀 24/7 поддержка</span>
-                <span class="feature-item">⚡ Быстрый старт</span>
+            <div class="cards-grid">
+                <!-- Карточка 1: Старт -->
+                <div class="card">
+                    <div class="card-icon">🚀</div>
+                    <h3 class="card-title">Старт</h3>
+                    <div class="card-price">15 000 ₽ <small>/мес</small></div>
+                    <ul class="card-features">
+                        <li>✓ Бот для Telegram</li>
+                        <li>✓ До 1000 пользователей</li>
+                        <li>✓ Базовая аналитика</li>
+                        <li>✓ Поддержка по email</li>
+                    </ul>
+                    <a href="{{ url_for('price') }}" class="card-button">Подробнее</a>
+                </div>
+                
+                <!-- Карточка 2: Бизнес -->
+                <div class="card">
+                    <div class="card-icon">💼</div>
+                    <h3 class="card-title">Бизнес</h3>
+                    <div class="card-price">35 000 ₽ <small>/мес</small></div>
+                    <ul class="card-features">
+                        <li>✓ Бот для Telegram/Discord</li>
+                        <li>✓ До 10 000 пользователей</li>
+                        <li>✓ Расширенная аналитика</li>
+                        <li>✓ Интеграция с CRM</li>
+                        <li>✓ Приоритетная поддержка</li>
+                    </ul>
+                    <a href="{{ url_for('price') }}" class="card-button">Подробнее</a>
+                </div>
+                
+                <!-- Карточка 3: Корпоративный -->
+                <div class="card">
+                    <div class="card-icon">🏢</div>
+                    <h3 class="card-title">Корпоративный</h3>
+                    <div class="card-price">75 000 ₽ <small>/мес</small></div>
+                    <ul class="card-features">
+                        <li>✓ Любые платформы</li>
+                        <li>✓ Неограниченно</li>
+                        <li>✓ ИИ-ассистенты</li>
+                        <li>✓ Индивидуальная разработка</li>
+                        <li>✓ Выделенный менеджер</li>
+                        <li>✓ 24/7 поддержка</li>
+                    </ul>
+                    <a href="{{ url_for('price') }}" class="card-button">Подробнее</a>
+                </div>
             </div>
         </div>
         
-        <!-- Кнопки (оставляем как есть) -->
-        <a href="{{ url_for('price') }}" class="image-button button-1">ЦЕНЫ</a>
-        <a href="{{ url_for('examples') }}" class="image-button button-2">ПРИМЕРЫ РАБОТ</a>
-        <a href="{{ url_for('support') }}" class="image-button button-3">ПОДДЕРЖКА</a>
-        <a href="{{ url_for('personal_account') }}" class="image-button button-4">ЛИЧНЫЙ КАБИНЕТ</a>
+        <!-- Блок с примерами работ -->
+        <div class="examples-section">
+            <h2 class="examples-title">Примеры наших работ</h2>
+            
+            <div class="examples-grid">
+                <!-- Пример 1 -->
+                <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
+                    <img src="{{ url_for('static', filename='images/works/work1.jpg') }}" alt="Работа 1" class="example-image">
+                    <div class="example-overlay">
+                        <h3 class="example-title">Бот для ресторана</h3>
+                        <p class="example-description">Бронирование столиков, меню, отзывы</p>
+                    </div>
+                </div>
+                
+                <!-- Пример 2 -->
+                <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
+                    <img src="{{ url_for('static', filename='images/works/work2.jpg') }}" alt="Работа 2" class="example-image">
+                    <div class="example-overlay">
+                        <h3 class="example-title">Интернет-магазин</h3>
+                        <p class="example-description">Каталог, корзина, оплата, доставка</p>
+                    </div>
+                </div>
+                
+                <!-- Пример 3 -->
+                <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
+                    <img src="{{ url_for('static', filename='images/works/work3.jpg') }}" alt="Работа 3" class="example-image">
+                    <div class="example-overlay">
+                        <h3 class="example-title">Чат поддержки</h3>
+                        <p class="example-description">Автоматические ответы, эскалация</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="{{ url_for('examples') }}" class="card-button" style="background: #667eea; color: white;">Смотреть все работы</a>
+            </div>
+        </div>
     </div>
 </body>
 </html>

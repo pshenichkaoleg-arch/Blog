@@ -188,6 +188,20 @@ def create():
         return redirect(url_for('index'))
     return render_template('create.html')
 
+@app.route('/tarif/start')
+def tarif_start():
+    """Страница тарифа Старт"""
+    return render_template('tarif_start.html')
+
+@app.route('/tarif/business')
+def tarif_business():
+    """Страница тарифа Бизнес"""
+    return render_template('tarif_business.html')
+
+@app.route('/tarif/corporate')
+def tarif_corporate():
+    """Страница тарифа Корпоративный"""
+    return render_template('tarif_corporate.html')
 
 @app.route('/logout')
 @login_required

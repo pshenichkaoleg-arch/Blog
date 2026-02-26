@@ -1,0 +1,595 @@
+{% extends "base.html" %}
+{% block title %}Тариф Старт{% endblock %}
+
+{% block styles %}
+<style>
+    /* Логотип */
+    .logo {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        z-index: 1001;
+        max-width: 150px;
+    }
+    
+    .logo img {
+        width: 100%;
+        height: auto;
+        max-height: 50px;
+        object-fit: contain;
+        transition: opacity 0.3s ease;
+    }
+    
+    .logo img:hover {
+        opacity: 0.8;
+    }
+
+    /* Меню навигации */
+    .nav-menu {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        display: flex;
+        gap: 20px;
+        z-index: 1000;
+    }
+
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 8px 16px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        font-weight: 600;
+    }
+
+    /* Кнопка "На главную" */
+    .home-button {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .home-button:hover {
+        background: rgba(0, 0, 0, 0.4);
+        transform: translateX(-50%) translateY(-2px);
+        color: white;
+    }
+
+    /* Фон с твоим изображением */
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-image: url("{{ url_for('static', filename='images/BG_2.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+    }
+
+    /* Полупрозрачный слой для читаемости */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(3px);
+        z-index: 0;
+    }
+
+    /* Скрываем стандартную навигацию */
+    .navbar {
+        display: none !important;
+    }
+
+    /* Основной контейнер */
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 100px 20px 100px 20px;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Карточка тарифа */
+    .tariff-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        animation: cardAppear 0.8s ease;
+        position: relative;
+    }
+
+    @keyframes cardAppear {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Заголовок карточки */
+    .card-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .card-header h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin: 0 0 10px 0;
+        position: relative;
+        z-index: 1;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        animation: glow 3s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+        0%, 100% { text-shadow: 2px 2px 10px rgba(0,0,0,0.3); }
+        50% { text-shadow: 0 0 20px rgba(255,255,255,0.8), 2px 2px 10px rgba(0,0,0,0.3); }
+    }
+
+    .card-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Тело карточки */
+    .card-body {
+        padding: 40px;
+        background: transparent;
+    }
+
+    /* Цена */
+    .price-block {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        animation: pricePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pricePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+
+    .price-amount {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: #667eea;
+        line-height: 1;
+    }
+
+    .price-amount small {
+        font-size: 1rem;
+        font-weight: 400;
+        color: #666;
+    }
+
+    /* Секции */
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: white;
+        margin: 30px 0 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .section-title span {
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        animation: rotate 10s linear infinite;
+    }
+
+    /* Списки */
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 20px 0;
+    }
+
+    .feature-list li {
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.3s ease;
+        animation: slideIn 0.5s ease;
+        animation-fill-mode: both;
+        color: white;
+    }
+
+    .feature-list li:hover {
+        transform: translateX(10px);
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding-left: 15px;
+    }
+
+    .feature-list li:nth-child(1) { animation-delay: 0.1s; }
+    .feature-list li:nth-child(2) { animation-delay: 0.2s; }
+    .feature-list li:nth-child(3) { animation-delay: 0.3s; }
+    .feature-list li:nth-child(4) { animation-delay: 0.4s; }
+    .feature-list li:nth-child(5) { animation-delay: 0.5s; }
+    .feature-list li:nth-child(6) { animation-delay: 0.6s; }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .feature-icon {
+        width: 28px;
+        height: 28px;
+        background: #2ecc71;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .feature-text strong {
+        color: #ffd700;
+        display: block;
+        margin-bottom: 3px;
+        font-size: 1.1rem;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .feature-text .description {
+        color: rgba(255,255,255,0.9);
+        font-size: 0.9rem;
+    }
+
+    /* Дополнительные возможности */
+    .extra-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 30px 0;
+    }
+
+    .extra-list li {
+        padding: 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+        border-bottom: 1px dashed rgba(255,255,255,0.1);
+        animation: slideInRight 0.5s ease;
+        animation-fill-mode: both;
+    }
+
+    .extra-list li:nth-child(1) { animation-delay: 0.1s; }
+    .extra-list li:nth-child(2) { animation-delay: 0.2s; }
+    .extra-list li:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .extra-icon {
+        width: 25px;
+        height: 25px;
+        background: #f39c12;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    /* Кнопки */
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+        animation: fadeIn 0.8s ease 0.7s both;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .btn-primary, .btn-secondary {
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-primary:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+    }
+
+    .btn-secondary:hover {
+        background: white;
+        color: #667eea;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255,255,255,0.2);
+    }
+
+    /* Адаптация */
+    @media (max-width: 768px) {
+        .logo {
+            top: 20px;
+            left: 20px;
+            max-width: 100px;
+        }
+
+        .nav-menu {
+            top: 20px;
+            right: 20px;
+            gap: 10px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .home-button {
+            padding: 8px 20px;
+            font-size: 13px;
+        }
+
+        .card-header h1 {
+            font-size: 2.5rem;
+        }
+
+        .price-amount {
+            font-size: 2.5rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn-primary, .btn-secondary {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Анимированные частицы -->
+{% for i in range(20) %}
+<div class="particle" style="position: fixed; left: {{ range(0, 100) | random }}%; width: {{ range(2, 8) | random }}px; height: {{ range(2, 8) | random }}px; background: rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; animation: float {{ range(10, 30) | random }}s infinite linear; animation-delay: -{{ range(0, 20) | random }}s; z-index: 0;"></div>
+{% endfor %}
+
+<!-- Логотип -->
+<div class="logo">
+    <a href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Логотип">
+    </a>
+</div>
+
+<!-- Меню навигации -->
+<div class="nav-menu">
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('personal_account') }}" class="nav-link">ЛИЧНЫЙ КАБИНЕТ</a>
+    {% else %}
+        <a href="{{ url_for('email_login') }}" class="nav-link">ВОЙТИ</a>
+    {% endif %}
+    <a href="{{ url_for('price') }}" class="nav-link">ЦЕНЫ</a>
+    <a href="{{ url_for('examples') }}" class="nav-link">ПРИМЕРЫ</a>
+    <a href="{{ url_for('support') }}" class="nav-link">ПОДДЕРЖКА</a>
+</div>
+
+<!-- Кнопка "На главную" -->
+<a href="{{ url_for('index') }}" class="home-button">← НА ГЛАВНУЮ</a>
+
+<div class="container">
+    <div class="tariff-card">
+        <div class="card-header">
+            <h1>Старт</h1>
+            <p>Для небольших проектов</p>
+        </div>
+        <div class="card-body">
+            <div class="price-block">
+                <span class="price-amount">15 000 ₽ <small>/мес</small></span>
+            </div>
+
+            <div class="section-title">
+                <span>✓</span> Что входит в тариф
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="feature-icon">✓</span>
+                    <div class="feature-text">
+                        <strong>1 Telegram бот</strong>
+                        <span class="description">полностью настроенный под ваш бизнес</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">✓</span>
+                    <div class="feature-text">
+                        <strong>До 1000 пользователей</strong>
+                        <span class="description">активная аудитория</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">✓</span>
+                    <div class="feature-text">
+                        <strong>Базовая аналитика</strong>
+                        <span class="description">статистика действий, графики</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">✓</span>
+                    <div class="feature-text">
+                        <strong>Поддержка по email</strong>
+                        <span class="description">отвечаем в течение 24 часов</span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="section-title">
+                <span>➕</span> Дополнительные возможности
+            </div>
+            <ul class="extra-list">
+                <li><span class="extra-icon">➕</span> Подключение дополнительных платформ — от 5000 ₽</li>
+                <li><span class="extra-icon">➕</span> Интеграция с CRM — от 10 000 ₽</li>
+                <li><span class="extra-icon">➕</span> Индивидуальный дизайн — от 15 000 ₽</li>
+            </ul>
+
+            <div class="btn-group">
+                <a href="{{ url_for('support') }}" class="btn-primary">Заказать</a>
+                <a href="{{ url_for('index') }}#content" class="btn-secondary">Все тарифы</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes float {
+    from {
+        transform: translateY(100vh) rotate(0deg);
+    }
+    to {
+        transform: translateY(-100vh) rotate(360deg);
+    }
+}
+</style>
+{% endblock %}

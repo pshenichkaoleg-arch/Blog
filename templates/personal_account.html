@@ -1,65 +1,598 @@
 {% extends "base.html" %}
 {% block title %}Личный кабинет{% endblock %}
-{% block content %}
-<div class="container">
-    <h1 class="text-center mb-5">Личный кабинет</h1>
+
+{% block styles %}
+<style>
+    /* Скрываем стандартную навигацию */
+    .navbar {
+        display: none !important;
+    }
+
+    /* Логотип */
+    .logo {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        z-index: 1001;
+        max-width: 150px;
+    }
     
+    .logo img {
+        width: 100%;
+        height: auto;
+        max-height: 50px;
+        object-fit: contain;
+        transition: opacity 0.3s ease;
+    }
+    
+    .logo img:hover {
+        opacity: 0.8;
+    }
+
+    /* Меню навигации */
+    .nav-menu {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        display: flex;
+        gap: 20px;
+        z-index: 1000;
+    }
+
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 8px 16px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        font-weight: 600;
+    }
+
+    /* Кнопка "На главную" */
+    .home-button {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .home-button:hover {
+        background: rgba(0, 0, 0, 0.4);
+        transform: translateX(-50%) translateY(-2px);
+        color: white;
+    }
+
+    /* Фон с изображением */
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-image: url("{{ url_for('static', filename='images/BG.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+    }
+
+    /* Полупрозрачный слой для читаемости */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(3px);
+        z-index: 0;
+    }
+
+    /* Основной контейнер */
+    .dashboard-container {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        padding: 100px 20px 100px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Приветствие */
+    .welcome-section {
+        margin-bottom: 50px;
+        animation: fadeInDown 0.8s ease;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .welcome-title {
+        font-size: 3rem;
+        font-weight: 700;
+        color: white;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        margin-bottom: 10px;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255,255,255,0.9);
+        text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+    }
+
+    /* Сетка карточек */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    /* Общие стили карточек */
+    .card-glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 25px;
+        color: white;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease;
+        animation-fill-mode: both;
+    }
+
+    .card-glass:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Задержки анимации для карточек */
+    .card-1 { animation-delay: 0.1s; }
+    .card-2 { animation-delay: 0.2s; }
+    .card-3 { animation-delay: 0.3s; }
+
+    /* Карточка профиля */
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffbb00, #3a6792);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: white;
+        border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    .user-info h3 {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+
+    .user-info p {
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .info-item {
+        background: rgba(255,255,255,0.1);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .info-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .info-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+    }
+
+    /* Карточка заказов */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .badge {
+        background: rgba(255,255,255,0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+    }
+
+    .orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .order-item {
+        background: rgba(255,255,255,0.05);
+        border-radius: 15px;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .order-item:hover {
+        background: rgba(255,255,255,0.1);
+        transform: translateX(5px);
+    }
+
+    .order-info h4 {
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+
+    .order-date {
+        font-size: 0.8rem;
+        opacity: 0.7;
+    }
+
+    .order-price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffd700;
+    }
+
+    .order-status {
+        font-size: 0.8rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.2);
+    }
+
+    .order-status.active {
+        background: #27ae60;
+    }
+
+    .order-status.pending {
+        background: #f39c12;
+    }
+
+    /* Статистика */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .stat-item {
+        background: rgba(255,255,255,0.1);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    /* Кнопка действий */
+    .action-button {
+        display: inline-block;
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #ffbb00, #3a6792);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: 20px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        color: white;
+    }
+
+    /* Адаптация для мобильных */
+    @media (max-width: 768px) {
+        .logo {
+            top: 20px;
+            left: 20px;
+            max-width: 100px;
+        }
+
+        .nav-menu {
+            top: 20px;
+            right: 20px;
+            gap: 10px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .home-button {
+            padding: 8px 20px;
+            font-size: 13px;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+        }
+
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .order-item {
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Логотип -->
+<div class="logo">
+    <a href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Логотип">
+    </a>
+</div>
+
+<!-- Меню навигации -->
+<div class="nav-menu">
     {% if current_user.is_authenticated %}
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Профиль</h5>
+        <a href="{{ url_for('personal_account') }}" class="nav-link {% if request.endpoint == 'personal_account' %}active{% endif %}">ЛИЧНЫЙ КАБИНЕТ</a>
+    {% else %}
+        <a href="{{ url_for('email_login') }}" class="nav-link {% if request.endpoint == 'email_login' %}active{% endif %}">ВОЙТИ</a>
+    {% endif %}
+    <a href="{{ url_for('price') }}" class="nav-link {% if request.endpoint == 'price' %}active{% endif %}">ЦЕНЫ</a>
+    <a href="{{ url_for('examples') }}" class="nav-link {% if request.endpoint == 'examples' %}active{% endif %}">ПРИМЕРЫ</a>
+    <a href="{{ url_for('support') }}" class="nav-link {% if request.endpoint == 'support' %}active{% endif %}">ПОДДЕРЖКА</a>
+</div>
+
+<!-- Кнопка "На главную" -->
+<a href="{{ url_for('index') }}" class="home-button">← НА ГЛАВНУЮ</a>
+
+<div class="dashboard-container">
+    {% if current_user.is_authenticated %}
+        <!-- Приветствие -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">С возвращением, {{ current_user.username }}! 👋</h1>
+            <p class="welcome-subtitle">Вот что происходит с вашими проектами</p>
+        </div>
+
+        <!-- Сетка карточек -->
+        <div class="dashboard-grid">
+            <!-- Карточка профиля -->
+            <div class="card-glass card-1">
+                <div class="profile-header">
+                    <div class="avatar">
+                        {{ current_user.username[0]|upper }}
                     </div>
-                    <div class="card-body">
-                        <p><strong>Имя пользователя:</strong> {{ current_user.username }}</p>
-                        <p><strong>Email:</strong> {{ current_user.email }}</p>
-                        <p><strong>Дата регистрации:</strong> {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
-                        <p><strong>ID пользователя:</strong> {{ current_user.id }}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">Мои действия</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="list-group">
-                            <a href="#" class="list-group-item list-group-item-action">Мои заказы (0)</a>
-                            <a href="#" class="list-group-item list-group-item-action">Мои сообщения (0)</a>
-                            <a href="#" class="list-group-item list-group-item-action">Настройки профиля</a>
-                            <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action text-danger">Выйти</a>
-                        </div>
+                    <div class="user-info">
+                        <h3>{{ current_user.username }}</h3>
+                        <p>{{ current_user.email }}</p>
+                        <p>На сайте с {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
                     </div>
                 </div>
                 
-                <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0">Статистика</h5>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-value">3</div>
+                        <div class="info-label">Проекта</div>
                     </div>
-                    <div class="card-body">
-                        <p>Всего входов: <span class="badge bg-secondary">0</span></p>
-                        <p>Последний визит: <span class="badge bg-secondary">{{ current_user.created_at.strftime('%d.%m.%Y %H:%M') }}</span></p>
+                    <div class="info-item">
+                        <div class="info-value">12</div>
+                        <div class="info-label">API ключей</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карточка последних заказов -->
+            <div class="card-glass card-2">
+                <div class="section-header">
+                    <h2>📦 Последние заказы</h2>
+                    <span class="badge">3 новых</span>
+                </div>
+                
+                <div class="orders-list">
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>Telegram бот для ресторана</h4>
+                            <div class="order-date">Заказ #124 • 15.02.2026</div>
+                        </div>
+                        <div class="order-price">25 000 ₽</div>
+                        <div class="order-status active">Активен</div>
+                    </div>
+                    
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>Discord модератор</h4>
+                            <div class="order-date">Заказ #123 • 10.02.2026</div>
+                        </div>
+                        <div class="order-price">35 000 ₽</div>
+                        <div class="order-status pending">В разработке</div>
+                    </div>
+                    
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>Бот поддержки 24/7</h4>
+                            <div class="order-date">Заказ #121 • 01.02.2026</div>
+                        </div>
+                        <div class="order-price">15 000 ₽</div>
+                        <div class="order-status active">Активен</div>
+                    </div>
+                </div>
+                
+                <a href="#" class="action-button">Все заказы →</a>
+            </div>
+
+            <!-- Карточка статистики -->
+            <div class="card-glass card-3">
+                <div class="section-header">
+                    <h2>📊 Статистика</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">127</div>
+                        <div class="stat-label">Запросов сегодня</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2.4k</div>
+                        <div class="stat-label">Всего запросов</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">98%</div>
+                        <div class="stat-label">Аптайм</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4.8</div>
+                        <div class="stat-label">Ср. оценка</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Использовано API</span>
+                        <span>65%</span>
+                    </div>
+                    <div style="height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px;">
+                        <div style="width: 65%; height: 100%; background: linear-gradient(90deg, #ffbb00, #3a6792); border-radius: 4px;"></div>
                     </div>
                 </div>
             </div>
         </div>
-    {% else %}
-        <div class="alert alert-warning text-center">
-            <h4 class="alert-heading">Вы не авторизованы!</h4>
-            <p>Пожалуйста, войдите или зарегистрируйтесь, чтобы получить доступ к личному кабинету.</p>
-            <hr>
-            <div class="d-flex justify-content-center gap-3">
-                <a href="{{ url_for('login') }}" class="btn btn-primary">Войти</a>
-                <a href="{{ url_for('register') }}" class="btn btn-success">Зарегистрироваться</a>
+
+        <!-- Дополнительная карточка (на всю ширину) -->
+        <div class="card-glass" style="animation: fadeInUp 0.8s ease 0.4s both;">
+            <div class="section-header">
+                <h2>⚡ Быстрые действия</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <a href="{{ url_for('create') }}" class="action-button" style="margin-top: 0;">➕ Новый проект</a>
+                <a href="#" class="action-button" style="margin-top: 0;">📄 Документация</a>
+                <a href="{{ url_for('support') }}" class="action-button" style="margin-top: 0;">💬 Поддержка</a>
             </div>
         </div>
+
+    {% else %}
+        <!-- Если пользователь не авторизован -->
+        <div class="welcome-section" style="text-align: center;">
+            <h1 class="welcome-title">Личный кабинет</h1>
+            <p class="welcome-subtitle">Войдите или зарегистрируйтесь, чтобы получить доступ</p>
+        </div>
+
+        <div style="display: flex; gap: 20px; justify-content: center;">
+            <a href="{{ url_for('email_login') }}" class="action-button" style="width: auto; padding: 15px 40px;">Войти</a>
+            <a href="{{ url_for('register') }}" class="action-button" style="width: auto; padding: 15px 40px; background: rgba(255,255,255,0.2);">Регистрация</a>
+        </div>
     {% endif %}
-    
-    <div class="text-center mt-4">
-        <a href="{{ url_for('index') }}" class="btn btn-secondary">Вернуться на главную</a>
-    </div>
 </div>
 {% endblock %}

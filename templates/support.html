@@ -1,12 +1,278 @@
 {% extends "base.html" %}
 {% block title %}Поддержка{% endblock %}
+
+{% block styles %}
+<style>
+    /* Логотип */
+    .logo {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        z-index: 1001;
+        max-width: 150px;
+    }
+    
+    .logo img {
+        width: 100%;
+        height: auto;
+        max-height: 50px;
+        object-fit: contain;
+        transition: opacity 0.3s ease;
+    }
+    
+    .logo img:hover {
+        opacity: 0.8;
+    }
+
+    /* Меню навигации */
+    .nav-menu {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        display: flex;
+        gap: 20px;
+        z-index: 1000;
+    }
+
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 8px 16px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        font-weight: 600;
+    }
+
+    /* Кнопка "На главную" */
+    .home-button {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .home-button:hover {
+        background: rgba(0, 0, 0, 0.4);
+        transform: translateX(-50%) translateY(-2px);
+        color: white;
+    }
+
+    /* Фон с твоим изображением */
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-image: url("{{ url_for('static', filename='images/BG_2.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+    }
+
+    /* Полупрозрачный слой для читаемости */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(3px);
+        z-index: 0;
+    }
+
+    /* Скрываем стандартную навигацию */
+    .navbar {
+        display: none !important;
+    }
+
+    /* Основной контейнер */
+    .container {
+        position: relative;
+        z-index: 1;
+        padding: 100px 20px 100px 20px;
+    }
+
+    /* Заголовок */
+    h1 {
+        color: white;
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 50px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Карточки */
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+        height: 100%;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-title {
+        color: #333;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    /* Форма */
+    .form-label {
+        color: #555;
+        font-weight: 500;
+    }
+
+    .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 12px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .form-control:focus {
+        border-color: #6e6559;
+        box-shadow: 0 0 0 3px rgba(110, 101, 89, 0.1);
+        outline: none;
+    }
+
+    /* Кнопка отправки */
+    .btn-primary {
+        background: #6e6559;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-primary:hover {
+        background: #000000;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Контактная информация */
+    .card p {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        color: #555;
+    }
+
+    .card p strong {
+        color: #6e6559;
+        min-width: 100px;
+        display: inline-block;
+    }
+
+    @media (max-width: 768px) {
+        .logo {
+            top: 20px;
+            left: 20px;
+            max-width: 100px;
+        }
+
+        .nav-menu {
+            top: 20px;
+            right: 20px;
+            gap: 10px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .home-button {
+            padding: 8px 20px;
+            font-size: 13px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-top: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+
+        .card p strong {
+            min-width: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<!-- Логотип -->
+<div class="logo">
+    <a href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Логотип">
+    </a>
+</div>
+
+<!-- Меню навигации -->
+<div class="nav-menu">
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('personal_account') }}" class="nav-link {% if request.endpoint == 'personal_account' %}active{% endif %}">ЛИЧНЫЙ КАБИНЕТ</a>
+    {% else %}
+        <a href="{{ url_for('email_login') }}" class="nav-link {% if request.endpoint == 'email_login' %}active{% endif %}">ВОЙТИ</a>
+    {% endif %}
+    <a href="{{ url_for('price') }}" class="nav-link {% if request.endpoint == 'price' %}active{% endif %}">ЦЕНЫ</a>
+    <a href="{{ url_for('examples') }}" class="nav-link {% if request.endpoint == 'examples' %}active{% endif %}">ПРИМЕРЫ</a>
+    <a href="{{ url_for('support') }}" class="nav-link {% if request.endpoint == 'support' %}active{% endif %}">ПОДДЕРЖКА</a>
+</div>
+
+<!-- Кнопка "На главную" -->
+<a href="{{ url_for('index') }}" class="home-button">← НА ГЛАВНУЮ</a>
+
 <div class="container">
-    <h1 class="text-center mb-5">Служба поддержки</h1>
+    <h1>Служба поддержки</h1>
     
     <div class="row">
         <div class="col-md-6">
-            <div class="card mb-4">
+            <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Связаться с нами</h5>
                     <form method="post" action="{{ url_for('support') }}">
@@ -31,16 +297,12 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Контакты</h5>
-                    <p><strong>Телефон:</strong> 8-800-123-45-67</p>
-                    <p><strong>Email:</strong> support@example.com</p>
+                    <p><strong>Телефон:</strong> 8-989-809-87-40</p>
+                    <p><strong>Email:</strong> Aban_tozz@mail.ru</p>
                     <p><strong>Часы работы:</strong> 24/7</p>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="text-center mt-4">
-        <a href="{{ url_for('index') }}" class="btn btn-primary">Вернуться на главную</a>
     </div>
 </div>
 {% endblock %}

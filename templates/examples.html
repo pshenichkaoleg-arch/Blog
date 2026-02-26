@@ -3,177 +3,337 @@
 
 {% block styles %}
 <style>
-    .works-container {
-        padding: 20px 0;
+    /* Логотип */
+    .logo {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        z-index: 1001;
+        max-width: 150px;
     }
     
-    .work-card {
-        position: relative;
-        height: 400px;
-        border-radius: 15px;
-        overflow: hidden;
-        margin-bottom: 30px;
-        cursor: pointer;
+    .logo img {
+        width: 100%;
+        height: auto;
+        max-height: 50px;
+        object-fit: contain;
+        transition: opacity 0.3s ease;
+    }
+    
+    .logo img:hover {
+        opacity: 0.8;
+    }
+
+    /* Меню навигации (как в примере работ) */
+    .nav-menu {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        display: flex;
+        gap: 20px;
+        z-index: 1000;
+    }
+
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 8px 16px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         transition: all 0.3s ease;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
-    
-    .work-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
     }
-    
-    .work-image {
-        position: absolute;
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        font-weight: 600;
+    }
+
+    /* Кнопка "На главную" */
+    .home-button {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .home-button:hover {
+        background: rgba(0, 0, 0, 0.4);
+        transform: translateX(-50%) translateY(-2px);
+    }
+
+    /* Фон с твоим изображением */
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-image: url("{{ url_for('static', filename='images/main.png') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+    }
+
+    /* Затемнение для читаемости */
+    body::before {
+        content: '';
+        position: fixed;
         top: 0;
         left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 0;
+    }
+
+    /* Скрываем стандартную навигацию */
+    .navbar {
+        display: none !important;
+    }
+
+    /* Основной контейнер */
+    .works-container {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        width: 100%;
+        padding: 100px 20px 100px 20px;
+    }
+
+    .works-title {
+        color: white;
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 50px;
+        letter-spacing: -0.5px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .works-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .work-card {
+        position: relative;
+        height: 350px;
+        border-radius: 15px;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        transition: transform 0.3s ease;
+        background: white;
+    }
+
+    .work-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .work-image {
         width: 100%;
         height: 100%;
         background-size: cover;
         background-position: center;
         transition: transform 0.5s ease;
     }
-    
+
     .work-card:hover .work-image {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
-    
+
     .work-overlay {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%);
+        background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2));
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding: 30px;
+        padding: 25px;
         color: white;
-        z-index: 2;
     }
-    
+
     .work-title {
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 8px;
     }
-    
+
     .work-description {
-        font-size: 16px;
+        font-size: 0.9rem;
         opacity: 0.9;
-        margin-bottom: 15px;
-        max-width: 80%;
+        margin-bottom: 10px;
+        max-width: 90%;
     }
-    
+
     .work-price {
-        font-size: 24px;
-        font-weight: bold;
+        font-size: 1.2rem;
+        font-weight: 600;
         color: #ffd700;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
-    
+
     .work-badge {
         position: absolute;
-        top: 20px;
-        right: 20px;
-        background: rgba(255,255,255,0.9);
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 215, 0, 0.9);
         color: #333;
-        padding: 8px 15px;
-        border-radius: 25px;
-        font-weight: bold;
-        z-index: 3;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
     }
-    
-    /* Для мобильных устройств */
+
+    @media (max-width: 1024px) {
+        .works-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     @media (max-width: 768px) {
+        .logo {
+            top: 20px;
+            left: 20px;
+            max-width: 100px;
+        }
+
+        .nav-menu {
+            top: 20px;
+            right: 20px;
+            gap: 10px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .home-button {
+            padding: 8px 20px;
+            font-size: 13px;
+        }
+
+        .works-title {
+            font-size: 2rem;
+        }
+
+        .works-grid {
+            grid-template-columns: 1fr;
+        }
+
         .work-card {
             height: 300px;
-        }
-        .work-title {
-            font-size: 22px;
-        }
-        .work-description {
-            font-size: 14px;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container works-container">
-    <h1 class="text-center mb-5">Наши работы</h1>
+<!-- Логотип -->
+<div class="logo">
+    <a href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Логотип">
+    </a>
+</div>
+
+<!-- Меню навигации (как в примере работ) -->
+<div class="nav-menu">
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('personal_account') }}" class="nav-link {% if request.endpoint == 'personal_account' %}active{% endif %}">ЛИЧНЫЙ КАБИНЕТ</a>
+    {% else %}
+        <a href="{{ url_for('email_login') }}" class="nav-link {% if request.endpoint == 'email_login' %}active{% endif %}">ВОЙТИ</a>
+    {% endif %}
+    <a href="{{ url_for('price') }}" class="nav-link {% if request.endpoint == 'price' %}active{% endif %}">ЦЕНЫ</a>
+    <a href="{{ url_for('examples') }}" class="nav-link {% if request.endpoint == 'examples' %}active{% endif %}">ПРИМЕРЫ</a>
+    <a href="{{ url_for('support') }}" class="nav-link {% if request.endpoint == 'support' %}active{% endif %}">ПОДДЕРЖКА</a>
+</div>
+
+<!-- Кнопка "На главную" -->
+<a href="{{ url_for('index') }}" class="home-button">← НА ГЛАВНУЮ</a>
+
+<div class="works-container">
+    <h1 class="works-title">Наши работы</h1>
     
-    <div class="row">
+    <div class="works-grid">
         <!-- Работа 1 -->
-        <div class="col-md-6">
-            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
-                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work1.jpg') }}');"></div>
-                <div class="work-overlay">
-                    <div class="work-title">ДИСКОРД БОТ</div>
-                     <div class="work-description">Идеален для больших серверов и автоматизации</div>
-                    <div class="work-price">от 2500 ₽</div>
-                </div>
+        <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+            <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work1.jpg') }}');"></div>
+            <div class="work-overlay">
+                <div class="work-title">ДИСКОРД БОТ</div>
+                <div class="work-description">Для больших серверов и автоматизации</div>
+                <div class="work-price">от 2500 ₽</div>
             </div>
         </div>
         
         <!-- Работа 2 -->
-        <div class="col-md-6">
-            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
-                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work2.jpg') }}');"></div>
-                <div class="work-overlay">
-                    <div class="work-title">ТЕЛЕГРАМ БОТ</div>
-                     <div class="work-description">бот под любые задачи</div>
-                    <div class="work-price">от 3000 ₽</div>
-                </div>
-               <div class="work-badge">Хит</div>
+        <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+            <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work2.jpg') }}');"></div>
+            <div class="work-overlay">
+                <div class="work-title">ТЕЛЕГРАМ БОТ</div>
+                <div class="work-description">Универсальный бот под любые задачи</div>
+                <div class="work-price">от 3000 ₽</div>
             </div>
+            <div class="work-badge">Хит</div>
         </div>
-    </div>
-    
-    <div class="row">
+        
         <!-- Работа 3 -->
-        <div class="col-md-4">
-            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
-                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work3.jpg') }}');"></div>
-                <div class="work-overlay">
-                    <div class="work-title">БОТ ПОДДЕРЖКИ</div>
-                     <div class="work-description">бот с заготовленными сценариями и работой 24/7</div>
-                    <div class="work-price">от 2000 ₽</div>
-                </div>
+        <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+            <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work3.jpg') }}');"></div>
+            <div class="work-overlay">
+                <div class="work-title">БОТ ПОДДЕРЖКИ</div>
+                <div class="work-description">24/7 с готовыми сценариями</div>
+                <div class="work-price">от 2000 ₽</div>
             </div>
         </div>
         
         <!-- Работа 4 -->
-        <div class="col-md-4">
-            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
-                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work4.jpg') }}');"></div>
-                <div class="work-overlay">
-                    <div class="work-title">БОТ ОТВЕТЧИК</div>
-                    <div class="work-description">Простой бот с ограничеными возможностями</div>
-                    <div class="work-price">от 500 ₽</div>
-                </div>
+        <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+            <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work4.jpg') }}');"></div>
+            <div class="work-overlay">
+                <div class="work-title">БОТ ОТВЕТЧИК</div>
+                <div class="work-description">Простой автоответчик с базовыми функциями</div>
+                <div class="work-price">от 500 ₽</div>
             </div>
         </div>
         
         <!-- Работа 5 -->
-        <div class="col-md-4">
-            <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
-                <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work5.jpg') }}');"></div>
-                <div class="work-overlay">
-                    <div class="work-title">КАСТОМНЫЙ БОТ</div>
-                    <div class="work-description">Бот с открытым кодом м возможностями доработки</div>
-                    <div class="work-price">от 2200 ₽</div>
-                </div>
+        <div class="work-card" onclick="window.location.href='{{ url_for('price') }}'">
+            <div class="work-image" style="background-image: url('{{ url_for('static', filename='images/works/work5.jpg') }}');"></div>
+            <div class="work-overlay">
+                <div class="work-title">КАСТОМНЫЙ БОТ</div>
+                <div class="work-description">С открытым кодом и возможностью доработки</div>
+                <div class="work-price">от 2200 ₽</div>
             </div>
         </div>
-    </div>
-    
-    <!-- Кнопка "Смотреть все" (опционально) -->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">На главную</a>
     </div>
 </div>
 {% endblock %}

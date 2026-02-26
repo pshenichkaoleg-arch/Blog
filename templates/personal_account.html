@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-5">Личный кабинет</h1>
+    
+    {% if current_user.is_authenticated %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Профиль</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Имя пользователя:</strong> {{ current_user.username }}</p>
+                        <p><strong>Email:</strong> {{ current_user.email }}</p>
+                        <p><strong>Дата регистрации:</strong> {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+                        <p><strong>ID пользователя:</strong> {{ current_user.id }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Мои действия</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            <a href="#" class="list-group-item list-group-item-action">Мои заказы (0)</a>
+                            <a href="#" class="list-group-item list-group-item-action">Мои сообщения (0)</a>
+                            <a href="#" class="list-group-item list-group-item-action">Настройки профиля</a>
+                            <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action text-danger">Выйти</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Статистика</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Всего входов: <span class="badge bg-secondary">0</span></p>
+                        <p>Последний визит: <span class="badge bg-secondary">{{ current_user.created_at.strftime('%d.%m.%Y %H:%M') }}</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center">
+            <h4 class="alert-heading">Вы не авторизованы!</h4>
+            <p>Пожалуйста, войдите или зарегистрируйтесь, чтобы получить доступ к личному кабинету.</p>
+            <hr>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Войти</a>
+                <a href="{{ url_for('register') }}" class="btn btn-success">Зарегистрироваться</a>
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Вернуться на главную</a>
+    </div>
+</div>
+{% endblock %}

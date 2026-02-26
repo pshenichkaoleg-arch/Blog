@@ -15,8 +15,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Конфигурация - ИСПРАВЛЕНО!
-app.config['oX5P1wtDAZKtvYZz7dzRI8sm'] = os.getenv('oX5P1wtDAZKtvYZz7dzRI8sm', 'default-secret-key-change-in-production')
+# Конфигурация
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key-change-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///blog.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -116,14 +116,40 @@ def log_user_action(user, action, details=None):
 
 @app.route('/')
 def index():
-    """Главная страница - только изображение"""
+    """Главная страница с полноэкранным изображением"""
     return render_template('only_image.html')
 
 
-@app.route('/about')
-def about():
-    """Страница о ресторане"""
-    return render_template('about.html')
+@app.route('/price')
+def price():
+    """Страница с ценами"""
+    return render_template('price.html')
+
+
+@app.route('/examples')
+def examples():
+    """Страница с примерами работ"""
+    return render_template('examples.html')
+
+
+@app.route('/support', methods=['GET', 'POST'])
+def support():
+    """Страница поддержки"""
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        message = request.form['message']
+        # Здесь можно добавить отправку email или сохранение в БД
+        flash('Спасибо за обращение! Мы ответим вам в ближайшее время.', 'success')
+        return redirect(url_for('support'))
+    return render_template('support.html')
+
+
+@app.route('/personal_account')
+@login_required
+def personal_account():
+    """Личный кабинет пользователя"""
+    return render_template('personal_account.html')
 
 
 @app.route('/design')
@@ -159,8 +185,8 @@ def create():
 def register():
     """Регистрация нового пользователя"""
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
-
+        return redirect(url_for('personal_account'))
+    
     form = RegistrationForm()
     if form.validate_on_submit():
         if User.query.filter_by(username=form.username.data).first():
@@ -169,15 +195,16 @@ def register():
         if User.query.filter_by(email=form.email.data).first():
             flash('Email уже зарегистрирован.', 'danger')
             return render_template('register.html', form=form)
-
+        
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         log_user_action(user, 'register')
+        
         flash('Регистрация прошла успешно! Теперь вы можете войти.', 'success')
         return redirect(url_for('login'))
-
+    
     return render_template('register.html', form=form)
 
 
@@ -185,8 +212,8 @@ def register():
 def login():
     """Вход пользователя"""
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
-
+        return redirect(url_for('personal_account'))
+    
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -195,10 +222,10 @@ def login():
             log_user_action(user, 'login')
             flash('Вы успешно вошли в систему.', 'success')
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('index'))
+            return redirect(next_page) if next_page else redirect(url_for('personal_account'))
         else:
             flash('Неверное имя пользователя или пароль.', 'danger')
-
+    
     return render_template('login.html', form=form)
 
 

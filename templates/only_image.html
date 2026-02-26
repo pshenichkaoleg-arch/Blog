@@ -63,12 +63,12 @@
         .button-2 {
             top: 5%;
             left: 65%;
-                    }
+        }
         
         .button-3 {
             top: 5%;
             left: 83%;
-                    }
+        }
         
         .button-4 {
             top: 5%;
@@ -91,11 +91,11 @@
              alt="Главное изображение" 
              class="fullscreen-image">
         
-        <!-- Кнопки (настройте текст и ссылки) -->
-        <a href="{{ url_for('design_gallery') }}" class="image-button button-1">ЦЕНЫ</a>
-        <a href="https://instagram.com" target="_blank" class="image-button button-2">ПРИМЕРЫ РАБОТ</a>
-        <a href="/about" class="image-button button-3">ПОДДЕРЖКА</a>
-        <a href="/booking" class="image-button button-4">ЛИЧНЫЙ КАБИНЕТ</a>
+        <!-- Кнопки с правильными ссылками -->
+        <a href="{{ url_for('price') }}" class="image-button button-1">ЦЕНЫ</a>
+        <a href="{{ url_for('examples') }}" class="image-button button-2">ПРИМЕРЫ РАБОТ</a>
+        <a href="{{ url_for('support') }}" class="image-button button-3">ПОДДЕРЖКА</a>
+        <a href="{{ url_for('personal_account') }}" class="image-button button-4">ЛИЧНЫЙ КАБИНЕТ</a>
     </div>
 </body>
 </html>

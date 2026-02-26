@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Цены{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-5">Наши цены</h1>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Услуга</th>
+                <th>Цена</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Услуга 1</td>
+                <td>1000 ₽</td>
+            </tr>
+            <tr>
+                <td>Услуга 2</td>
+                <td>2000 ₽</td>
+            </tr>
+            <tr>
+                <td>Услуга 3</td>
+                <td>3000 ₽</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Вернуться на главную</a>
+    </div>
+</div>
+{% endblock %}

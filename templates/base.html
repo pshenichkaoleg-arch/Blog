@@ -4,24 +4,33 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Мой сайт{% endblock %}</title>
+    <!-- Подключаем Bootstrap CSS (через CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Блок для подключения своих CSS-стилей в других шаблонах -->
+    {% block styles %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ (МЕНЮ) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Главная</a>  <!-- Убрали TWO POLES -->
+            <a class="navbar-brand" href="{{ url_for('index') }}">Главная</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <!-- Меню для авторизованного пользователя -->
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             <span class="nav-link">Привет, {{ current_user.username }}!</span>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('personal_account') }}">Личный кабинет</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
                         </li>
+                    <!-- Меню для гостя -->
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('login') }}">Войти</a>
@@ -30,18 +39,26 @@
                             <a class="nav-link" href="{{ url_for('register') }}">Регистрация</a>
                         </li>
                     {% endif %}
+                    <!-- Ссылка на страницу с ценами -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">Главная</a>
+                        <a class="nav-link" href="{{ url_for('price') }}">Цены</a>
                     </li>
+                    <!-- Ссылка на страницу с примерами работ -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('design_gallery') }}">Дизайн и цены</a>
+                        <a class="nav-link" href="{{ url_for('examples') }}">Примеры работ</a>
+                    </li>
+                    <!-- Ссылка на страницу поддержки -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('support') }}">Поддержка</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР ДЛЯ КОНТЕНТА -->
     <div class="container mt-4">
+        <!-- Блок для отображения flash-сообщений (об успехе, ошибке и т.д.) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -53,15 +70,20 @@
             {% endif %}
         {% endwith %}
 
+        <!-- ОСНОВНОЙ КОНТЕНТ СТРАНИЦЫ (подставляется из дочерних шаблонов) -->
         {% block content %}{% endblock %}
     </div>
 
+    <!-- ПОДВАЛ (footer) -->
     <footer class="footer mt-5 py-3 bg-light">
         <div class="container text-center">
-            <span class="text-muted">© 2026 Все права защищены</span>
+            <span class="text-muted">© 2026 Все права защищены.</span>
         </div>
     </footer>
 
+    <!-- Подключаем Bootstrap JS (для работы меню-бургера и всплывающих окон) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Блок для подключения своих JS-скриптов -->
+    {% block scripts %}{% endblock %}
 </body>
 </html>

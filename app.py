@@ -189,17 +189,23 @@ def register():
     
     form = RegistrationForm()
     if form.validate_on_submit():
+        # Проверка уникальности имени
         if User.query.filter_by(username=form.username.data).first():
             flash('Имя пользователя уже занято.', 'danger')
             return render_template('register.html', form=form)
+        
+        # Проверка уникальности email
         if User.query.filter_by(email=form.email.data).first():
             flash('Email уже зарегистрирован.', 'danger')
             return render_template('register.html', form=form)
         
+        # Создание нового пользователя
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        
+        # Логируем регистрацию
         log_user_action(user, 'register')
         
         flash('Регистрация прошла успешно! Теперь вы можете войти.', 'success')

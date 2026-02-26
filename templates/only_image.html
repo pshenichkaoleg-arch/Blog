@@ -46,16 +46,16 @@
         /* Логотип */
         .logo {
             position: absolute;
-            top: 60px;
-            left: 90px;
+            top: 30px;
+            left: 50px;
             z-index: 3;
             max-width: 200px;
         }
         
         .logo img {
-            width: 150%;
+            width: 100%;
             height: auto;
-            max-height: 200px;
+            max-height: 80px;
             object-fit: contain;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
         }
@@ -105,7 +105,7 @@
             position: absolute;
             background-color: rgba(255, 255, 255, 0.9);
             color: #333;
-            padding: 25px 35px;
+            padding: 12px 30px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
@@ -125,7 +125,6 @@
             color: #000;
         }
         
-        /* Позиции кнопок (настройте под ваше изображение) */
         .button-support {
             top: 5%;
             right: 12%;
@@ -411,18 +410,24 @@
             .card-price {
                 font-size: 28px;
             }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Верхняя часть с изображением -->
     <div class="hero-section">
+        <!-- ГЛАВНОЕ ИЗОБРАЖЕНИЕ - замените main.png на ваше фото -->
         <img src="{{ url_for('static', filename='images/main.png') }}" 
              alt="Главное изображение" 
              class="fullscreen-image">
         
         <div class="overlay"></div>
         
+        <!-- ЛОГОТИП - замените logo.png на ваш логотип -->
         <div class="logo">
             <img src="{{ url_for('static', filename='images/logo.png') }}" 
                  alt="Логотип">
@@ -437,7 +442,7 @@
             </p>
         </div>
         
-        <!-- Кнопки на изображении (только нужные) -->
+        <!-- Кнопки на изображении -->
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('personal_account') }}" class="image-button button-login">ЛИЧНЫЙ КАБИНЕТ</a>
         {% else %}
@@ -511,29 +516,29 @@
             <h2 class="examples-title">Примеры наших работ</h2>
             
             <div class="examples-grid">
-                <!-- Пример 1 -->
+                <!-- Пример 1 - замените work1.jpg на ваше фото -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work1.jpg') }}" alt="Работа 1" class="example-image">
                     <div class="example-overlay">
-                        <h3 class="example-title">Бот для ресторана</h3>
+                        <h3 class="example-title">БОТ ДЛЯ ДИСКОРДА</h3>
                         <p class="example-description">Бронирование столиков, меню, отзывы</p>
                     </div>
                 </div>
                 
-                <!-- Пример 2 -->
+                <!-- Пример 2 - замените work2.jpg на ваше фото -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work2.jpg') }}" alt="Работа 2" class="example-image">
                     <div class="example-overlay">
-                        <h3 class="example-title">Интернет-магазин</h3>
+                        <h3 class="example-title">ТЕЛЕГРАММ БОТ</h3>
                         <p class="example-description">Каталог, корзина, оплата, доставка</p>
                     </div>
                 </div>
                 
-                <!-- Пример 3 -->
+                <!-- Пример 3 - замените work3.jpg на ваше фото -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work3.jpg') }}" alt="Работа 3" class="example-image">
                     <div class="example-overlay">
-                        <h3 class="example-title">Чат поддержки</h3>
+                        <h3 class="example-title">БОТ ПОДДЕРЖКИ</h3>
                         <p class="example-description">Автоматические ответы, эскалация</p>
                     </div>
                 </div>

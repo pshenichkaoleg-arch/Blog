@@ -1,34 +1,364 @@
 {% extends "base.html" %}
-{% block title %}Цены{% endblock %}
+{% block title %}Цены на разработку ботов{% endblock %}
+
+{% block styles %}
+<style>
+    /* Градиентный фон для всей страницы (оставляем) */
+    .pricing-page {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        padding: 60px 0;
+    }
+    
+    /* Стили для карточек - монохром */
+    .pricing-card {
+        background: #ffffff;
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        height: 100%;
+    }
+    
+    .pricing-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    
+    /* Заголовок карточки - монохром */
+    .card-header-custom {
+        background: #2c3e50;
+        color: white;
+        text-align: center;
+        padding: 30px 20px;
+        border-bottom: none;
+    }
+    
+    .card-header-custom h3 {
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+    
+    /* Тело карточки */
+    .card-body-custom {
+        padding: 30px;
+        background: white;
+    }
+    
+    /* Цена */
+    .price-tag {
+        font-size: 48px;
+        font-weight: 800;
+        color: #2c3e50;
+        margin: 20px 0;
+        text-align: center;
+    }
+    
+    .price-tag small {
+        font-size: 16px;
+        font-weight: 400;
+        color: #7f8c8d;
+    }
+    
+    /* Подзаголовок */
+    .price-subtitle {
+        text-align: center;
+        color: #7f8c8d;
+        margin-bottom: 20px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Список возможностей */
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+    
+    .feature-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid #ecf0f1;
+        color: #34495e;
+    }
+    
+    .feature-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .feature-list .included {
+        color: #27ae60;
+        font-weight: 500;
+    }
+    
+    .feature-list .not-included {
+        color: #e74c3c;
+        text-decoration: line-through;
+        opacity: 0.7;
+    }
+    
+    /* Кнопка - монохром */
+    .btn-order {
+        background: #34495e;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        width: 100%;
+        cursor: pointer;
+    }
+    
+    .btn-order:hover {
+        background: #2c3e50;
+        transform: scale(1.02);
+        color: white;
+    }
+    
+    /* Выделение для популярного тарифа (тонкое) */
+    .popular-card {
+        border: 2px solid #3498db;
+        transform: scale(1.02);
+    }
+    
+    .popular-card .card-header-custom {
+        background: #2980b9;
+    }
+    
+    /* Бейдж "Популярное" */
+    .badge-custom {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #3498db;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10;
+    }
+    
+    /* Бейдж для бюджетного тарифа */
+    .badge-budget {
+        background: #95a5a6;
+        color: white;
+    }
+    
+    /* Заголовок страницы */
+    .page-title {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        margin-bottom: 20px;
+    }
+    
+    .page-subtitle {
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 50px;
+    }
+    
+    /* Дополнительные услуги - монохром */
+    .extra-card {
+        background: white;
+        border: none;
+        border-radius: 10px;
+        padding: 25px;
+        text-align: center;
+        height: 100%;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .extra-card h5 {
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .extra-card p {
+        color: #7f8c8d;
+        margin-bottom: 20px;
+    }
+    
+    .extra-card h3 {
+        color: #2c3e50;
+        font-weight: 800;
+    }
+    
+    /* Адаптация для мобильных */
+    @media (max-width: 768px) {
+        .pricing-page {
+            padding: 30px 0;
+        }
+        
+        .price-tag {
+            font-size: 36px;
+        }
+        
+        .popular-card {
+            transform: scale(1);
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1 class="text-center mb-5">Наши цены</h1>
-    
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Услуга</th>
-                <th>Цена</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Услуга 1</td>
-                <td>1000 ₽</td>
-            </tr>
-            <tr>
-                <td>Услуга 2</td>
-                <td>2000 ₽</td>
-            </tr>
-            <tr>
-                <td>Услуга 3</td>
-                <td>3000 ₽</td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <div class="text-center mt-4">
-        <a href="{{ url_for('index') }}" class="btn btn-primary">Вернуться на главную</a>
+<div class="pricing-page">
+    <div class="container">
+        <h1 class="text-center page-title">Цены на разработку ботов</h1>
+        <p class="text-center page-subtitle lead">Выберите подходящий тариф для вашего бизнеса</p>
+        
+        <div class="row">
+            <!-- Тариф 1: Автоответчик (Бюджетный) -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="pricing-card">
+                    <div class="card-header-custom">
+                        <h3>АВТООТВЕТЧИК</h3>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="price-tag">
+                            500 ₽
+                            <small>/мес</small>
+                        </div>
+                        <div class="price-subtitle">Для старта</div>
+                        <ul class="feature-list">
+                            <li class="included">✓ Простой автоответчик</li>
+                            <li class="included">✓ До 100 сообщений/день</li>
+                            <li class="included">✓ Настройка приветствия</li>
+                            <li class="included">✓ Команды /start, /help</li>
+                            <li class="not-included">✗ База данных</li>
+                            <li class="not-included">✗ Аналитика</li>
+                            <li class="not-included">✗ Интеграции</li>
+                        </ul>
+                        <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Тариф 2: Базовый -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="pricing-card">
+                    <div class="card-header-custom">
+                        <h3>БАЗОВЫЙ</h3>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="price-tag">
+                            3 000 ₽
+                            <small>разово</small>
+                        </div>
+                        <div class="price-subtitle">Для малого бизнеса</div>
+                        <ul class="feature-list">
+                            <li class="included">✓ 1 Telegram бот</li>
+                            <li class="included">✓ До 1000 пользователей</li>
+                            <li class="included">✓ Базовая аналитика</li>
+                            <li class="included">✓ Поддержка 2 недели</li>
+                            <li class="included">✓ Документация</li>
+                            <li class="not-included">✗ Интеграция с CRM</li>
+                            <li class="not-included">✗ ИИ-функции</li>
+                        </ul>
+                        <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Тариф 3: Стандарт (рекомендуемый) -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="pricing-card popular-card">
+                    <span class="badge-custom">ПОПУЛЯРНОЕ</span>
+                    <div class="card-header-custom">
+                        <h3>СТАНДАРТ</h3>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="price-tag">
+                            5 000 ₽
+                            <small>разово</small>
+                        </div>
+                        <div class="price-subtitle">Для растущего бизнеса</div>
+                        <ul class="feature-list">
+                            <li class="included">✓ 1 бот для Telegram/Discord</li>
+                            <li class="included">✓ До 10 000 пользователей</li>
+                            <li class="included">✓ Расширенная аналитика</li>
+                            <li class="included">✓ Интеграция с CRM</li>
+                            <li class="included">✓ Поддержка 1 месяц</li>
+                            <li class="included">✓ Админ-панель</li>
+                            <li class="not-included">✗ ИИ-ассистент</li>
+                        </ul>
+                        <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Тариф 4: Премиум -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="pricing-card">
+                    <div class="card-header-custom">
+                        <h3>ПРЕМИУМ</h3>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="price-tag">
+                            12 000 ₽
+                            <small>разово</small>
+                        </div>
+                        <div class="price-subtitle">Для крупного бизнеса</div>
+                        <ul class="feature-list">
+                            <li class="included">✓ До 3 ботов на разных платформах</li>
+                            <li class="included">✓ Неограниченно пользователей</li>
+                            <li class="included">✓ ИИ-ассистент (GPT)</li>
+                            <li class="included">✓ Полная аналитика</li>
+                            <li class="included">✓ Интеграция с 1С/CRM</li>
+                            <li class="included">✓ Поддержка 3 месяца</li>
+                            <li class="included">✓ Индивидуальный дизайн</li>
+                        </ul>
+                        <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Дополнительные услуги - монохром -->
+        <h2 class="text-center text-white mt-5 mb-4">Дополнительные услуги</h2>
+        
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="extra-card">
+                    <h5>Ежемесячная поддержка</h5>
+                    <p>Техническая поддержка, обновления, резервное копирование</p>
+                    <h3>5 000 ₽/мес</h3>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="extra-card">
+                    <h5>Интеграция с Instagram</h5>
+                    <p>Подключение Instagram Direct API</p>
+                    <h3>15 000 ₽</h3>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="extra-card">
+                    <h5>WhatsApp Business API</h5>
+                    <p>Официальное подключение к WhatsApp Business</p>
+                    <h3>20 000 ₽</h3>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Примечание -->
+        <div class="alert alert-light text-center mt-4">
+            <p class="mb-0">Все цены указаны в российских рублях. Возможна индивидуальная разработка под ваши задачи.</p>
+        </div>
+        
+        <!-- Кнопка назад -->
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-light btn-lg">Вернуться на главную</a>
+        </div>
     </div>
 </div>
 {% endblock %}

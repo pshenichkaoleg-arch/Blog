@@ -1,59 +1,454 @@
-{% extends "base.html" %}
-{% block title %}Регистрация{% endblock %}
-{% block content %}
-<div class="row">
-    <div class="col-md-6 offset-md-3">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Регистрация нового пользователя</h4>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <!-- Подключаем Bootstrap для базовых стилей (но мы его переопределим) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Анимированные фоновые элементы */
+        .bg-bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .bg-bubbles span {
+            position: absolute;
+            bottom: -150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: bubble 25s infinite;
+        }
+        
+        @keyframes bubble {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Основной контейнер */
+        .register-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Карточка регистрации */
+        .register-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Заголовок */
+        .register-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .register-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .register-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .register-header p a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .register-header p a:hover {
+            color: #764ba2;
+        }
+        
+        /* Форма */
+        .register-form {
+            width: 100%;
+        }
+        
+        /* Группа полей */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Поля ввода */
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            outline: none;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-control.is-invalid {
+            border-color: #e74c3c;
+        }
+        
+        /* Сообщения об ошибках */
+        .invalid-feedback {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+            padding-left: 15px;
+        }
+        
+        /* Подсказка */
+        .form-text {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+            padding-left: 15px;
+        }
+        
+        /* Кнопка отправки */
+        .btn-register {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-register:active {
+            transform: translateY(0);
+        }
+        
+        /* Анимация волны на кнопке */
+        .btn-register::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-register:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Разделитель */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 30px 0;
+            color: #999;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .divider span {
+            padding: 0 15px;
+            font-size: 14px;
+        }
+        
+        /* Социальные кнопки (если нужны) */
+        .social-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .social-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .social-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+            border-color: #667eea;
+        }
+        
+        /* Уведомления (flash-сообщения) */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Ссылка на главную */
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        
+        .back-link a:hover {
+            color: white;
+        }
+        
+        /* Адаптация для мобильных */
+        @media (max-width: 576px) {
+            .register-card {
+                padding: 30px 20px;
+            }
+            
+            .register-header h1 {
+                font-size: 28px;
+            }
+            
+            .form-control {
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Анимированные пузырьки на фоне -->
+    <div class="bg-bubbles">
+        <span style="width: 80px; height: 80px; left: 10%; animation-duration: 20s;"></span>
+        <span style="width: 40px; height: 40px; left: 20%; animation-duration: 15s; animation-delay: 2s;"></span>
+        <span style="width: 100px; height: 100px; left: 30%; animation-duration: 25s; animation-delay: 4s;"></span>
+        <span style="width: 60px; height: 60px; left: 40%; animation-duration: 18s; animation-delay: 1s;"></span>
+        <span style="width: 120px; height: 120px; left: 50%; animation-duration: 30s; animation-delay: 3s;"></span>
+        <span style="width: 70px; height: 70px; left: 60%; animation-duration: 22s; animation-delay: 5s;"></span>
+        <span style="width: 90px; height: 90px; left: 70%; animation-duration: 28s; animation-delay: 2.5s;"></span>
+        <span style="width: 50px; height: 50px; left: 80%; animation-duration: 17s; animation-delay: 3.5s;"></span>
+        <span style="width: 110px; height: 110px; left: 90%; animation-duration: 32s; animation-delay: 1.5s;"></span>
+    </div>
+
+    <div class="register-container">
+        <!-- Flash сообщения -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Карточка регистрации -->
+        <div class="register-card">
+            <div class="register-header">
+                <h1>Создать аккаунт</h1>
+                <p>Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a></p>
             </div>
-            <div class="card-body">
-                <form method="post">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="mb-3">
-                        {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control" + (' is-invalid' if form.username.errors else '')) }}
-                        {% for error in form.username.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                        <div class="form-text">От 4 до 80 символов, только буквы и цифры</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control" + (' is-invalid' if form.email.errors else '')) }}
-                        {% for error in form.email.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control" + (' is-invalid' if form.password.errors else '')) }}
-                        {% for error in form.password.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                        <div class="form-text">Минимум 6 символов</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.confirm.label(class="form-label") }}
-                        {{ form.confirm(class="form-control" + (' is-invalid' if form.confirm.errors else '')) }}
-                        {% for error in form.confirm.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        {{ form.submit(class="btn btn-primary btn-lg") }}
-                    </div>
-                </form>
+
+            <form method="post" class="register-form">
+                {{ form.hidden_tag() }}
+                
+                <!-- Поле: Имя пользователя -->
+                <div class="form-group">
+                    <label for="username">Имя пользователя</label>
+                    {{ form.username(class="form-control" + (' is-invalid' if form.username.errors else ''), placeholder="Введите имя пользователя") }}
+                    {% for error in form.username.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                    <div class="form-text">От 4 до 80 символов, только буквы и цифры</div>
+                </div>
+                
+                <!-- Поле: Email -->
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    {{ form.email(class="form-control" + (' is-invalid' if form.email.errors else ''), placeholder="Введите email") }}
+                    {% for error in form.email.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Поле: Пароль -->
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    {{ form.password(class="form-control" + (' is-invalid' if form.password.errors else ''), placeholder="Введите пароль") }}
+                    {% for error in form.password.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                    <div class="form-text">Минимум 6 символов</div>
+                </div>
+                
+                <!-- Поле: Подтверждение пароля -->
+                <div class="form-group">
+                    <label for="confirm">Подтверждение пароля</label>
+                    {{ form.confirm(class="form-control" + (' is-invalid' if form.confirm.errors else ''), placeholder="Повторите пароль") }}
+                    {% for error in form.confirm.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Кнопка регистрации -->
+                {{ form.submit(class="btn-register") }}
+            </form>
+
+            <!-- Разделитель (опционально) -->
+            <div class="divider">
+                <span>или зарегистрируйтесь через</span>
             </div>
-            <div class="card-footer text-center">
-                <p class="mb-0">Уже есть аккаунт? <a href="{{ url_for('login') }}">Войдите</a></p>
+
+            <!-- Социальные кнопки (если нужно, можете добавить ссылки) -->
+            <div class="social-buttons">
+                <a href="#" class="social-button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879v-6.99h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.99C18.343 21.128 22 16.991 22 12z"/>
+                    </svg>
+                </a>
+                <a href="#" class="social-button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98-3.56-.18-6.73-1.89-8.84-4.48-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.52 8.52 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.9 20.29 6.16 21 8.58 21c7.88 0 12.21-6.54 12.21-12.21 0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                    </svg>
+                </a>
+                <a href="#" class="social-button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.04c-5.5 0-10 4.46-10 9.96 0 4.41 2.87 8.16 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.71-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1.01.07 1.54 1.03 1.54 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.99 1.03-2.69-.1-.26-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.03.8-.22 1.65-.33 2.5-.33.85 0 1.7.11 2.5.33 1.91-1.3 2.75-1.03 2.75-1.03.55 1.38.2 2.39.1 2.65.64.7 1.03 1.6 1.03 2.69 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85 0 1.34-.01 2.42-.01 2.75 0 .27.18.58.69.48 3.97-1.34 6.83-5.09 6.83-9.5 0-5.5-4.5-9.96-10-9.96z"/>
+                    </svg>
+                </a>
             </div>
         </div>
+
+        <!-- Ссылка на главную -->
+        <div class="back-link">
+            <a href="{{ url_for('index') }}">← Вернуться на главную</a>
+        </div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Bootstrap JS для закрытия алертов -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

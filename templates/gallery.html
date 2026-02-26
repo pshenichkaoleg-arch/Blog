@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Галерея работ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-5">Наши работы</h1>
+    
+    <div class="row">
+        {% for work in works %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{{ work.path }}" class="card-img-top" alt="{{ work.name }}" style="height: 250px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ work.name }}</h5>
+                    <a href="{{ work.path }}" target="_blank" class="btn btn-primary">Увеличить</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if not works %}
+    <div class="alert alert-info">
+        В папке нет изображений. Добавьте файлы в static/images/works/
+    </div>
+    {% endif %}
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">На главную</a>
+    </div>
+</div>
+{% endblock %}

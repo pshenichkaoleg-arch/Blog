@@ -127,17 +127,12 @@
         
         .button-support {
             top: 5%;
-            right: 12%;
+            right: 15%;
         }
         
         .button-login {
             top: 5%;
-            right: 5%;
-        }
-        
-        .button-register {
-            top: 5%;
-            right: 5%;
+            right: 10%;
         }
         
         /* Кнопка для скролла вниз */
@@ -395,12 +390,12 @@
             
             .button-support {
                 top: 5%;
-                right: 10%;
+                right: 5%;
             }
             
-            .button-login, .button-register {
+            .button-login {
                 top: 5%;
-                right: 5%;
+                right: 10%;
             }
             
             .card {
@@ -420,14 +415,14 @@
 <body>
     <!-- Верхняя часть с изображением -->
     <div class="hero-section">
-        <!-- ГЛАВНОЕ ИЗОБРАЖЕНИЕ - замените main.png на ваше фото -->
+        <!-- ГЛАВНОЕ ИЗОБРАЖЕНИЕ -->
         <img src="{{ url_for('static', filename='images/main.png') }}" 
              alt="Главное изображение" 
              class="fullscreen-image">
         
         <div class="overlay"></div>
         
-        <!-- ЛОГОТИП - замените logo.png на ваш логотип -->
+        <!-- ЛОГОТИП -->
         <div class="logo">
             <img src="{{ url_for('static', filename='images/logo.png') }}" 
                  alt="Логотип">
@@ -446,8 +441,7 @@
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('personal_account') }}" class="image-button button-login">ЛИЧНЫЙ КАБИНЕТ</a>
         {% else %}
-            <a href="{{ url_for('login') }}" class="image-button button-login">ВОЙТИ</a>
-            <a href="{{ url_for('register') }}" class="image-button button-register">РЕГИСТРАЦИЯ</a>
+            <a href="{{ url_for('email_login') }}" class="image-button button-login">ВОЙТИ</a>
         {% endif %}
         
         <a href="{{ url_for('support') }}" class="image-button button-support">ПОДДЕРЖКА</a>
@@ -458,7 +452,7 @@
 
     <!-- Прокручиваемая часть с контентом -->
     <div id="content">
-        <!-- Блок с ценами и возможностями (три карточки) -->
+        <!-- Блок с ценами и возможностями -->
         <div class="content-section">
             <h2 class="section-title">Тарифы и возможности</h2>
             <p class="section-subtitle">Выберите подходящий план для вашего бизнеса</p>
@@ -516,30 +510,30 @@
             <h2 class="examples-title">Примеры наших работ</h2>
             
             <div class="examples-grid">
-                <!-- Пример 1 - замените work1.jpg на ваше фото -->
+                <!-- Пример 1 -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work1.jpg') }}" alt="Работа 1" class="example-image">
                     <div class="example-overlay">
-                        <h3 class="example-title">БОТ ДЛЯ ДИСКОРДА</h3>
+                        <h3 class="example-title">Telegram бот для ресторана</h3>
                         <p class="example-description">Бронирование столиков, меню, отзывы</p>
                     </div>
                 </div>
                 
-                <!-- Пример 2 - замените work2.jpg на ваше фото -->
+                <!-- Пример 2 -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work2.jpg') }}" alt="Работа 2" class="example-image">
                     <div class="example-overlay">
-                        <h3 class="example-title">ТЕЛЕГРАММ БОТ</h3>
+                        <h3 class="example-title">Бот для интернет-магазина</h3>
                         <p class="example-description">Каталог, корзина, оплата, доставка</p>
                     </div>
                 </div>
                 
-                <!-- Пример 3 - замените work3.jpg на ваше фото -->
+                <!-- Пример 3 -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work3.jpg') }}" alt="Работа 3" class="example-image">
                     <div class="example-overlay">
-                        <h3 class="example-title">БОТ ПОДДЕРЖКИ</h3>
-                        <p class="example-description">Автоматические ответы, эскалация</p>
+                        <h3 class="example-title">Discord бот для сообщества</h3>
+                        <p class="example-description">Модерация, музыка, уровни</p>
                     </div>
                 </div>
             </div>

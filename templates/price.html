@@ -3,86 +3,246 @@
 
 {% block styles %}
 <style>
-    /* Градиентный фон для всей страницы (оставляем) */
-    .pricing-page {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    /* Градиент на весь экран */
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
-        padding: 60px 0;
+        margin: 0;
+        padding: 0;
+        position: relative;
     }
     
-    /* Стили для карточек - монохром */
-    .pricing-card {
-        background: #ffffff;
+    /* Точечки на весь задний фон */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 30px 30px;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    /* Скрываем стандартную навигацию */
+    .navbar {
+        display: none !important;
+    }
+    
+    /* ===== КНОПКИ В ПРАВОМ ВЕРХНЕМ УГЛУ - ЕДИНЫЙ СТИЛЬ ===== */
+    .top-nav-buttons {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        display: flex;
+        gap: 12px;
+        z-index: 1000;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    
+    .nav-btn {
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
         transition: all 0.3s ease;
-        border: none;
-        border-radius: 15px;
+        position: relative;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Эффект при наведении */
+    .nav-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* Активная кнопка (текущая страница) */
+    .nav-btn.active {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        font-weight: 600;
+    }
+    
+    /* Основной контейнер */
+    .pricing-page {
+        min-height: 100vh;
+        width: 100%;
+        padding: 100px 0 60px 0;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Заголовки */
+    .page-title {
+        color: white;
+        text-align: center;
+        font-size: clamp(32px, 5vw, 48px);
+        font-weight: 800;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .page-subtitle {
+        color: rgba(255,255,255,0.9);
+        text-align: center;
+        font-size: clamp(16px, 2vw, 20px);
+        margin-bottom: 50px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Сетка карточек */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Стили карточек */
+    .pricing-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255,255,255,0.2);
     }
     
     .pricing-card:hover {
         transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.4);
     }
     
-    /* Заголовок карточки - монохром */
-    .card-header-custom {
-        background: #2c3e50;
-        color: white;
-        text-align: center;
+    /* Заголовок карточки */
+    .card-header {
         padding: 30px 20px;
-        border-bottom: none;
+        text-align: center;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
     }
     
-    .card-header-custom h3 {
+    .card-header h3 {
         margin: 0;
+        font-size: 24px;
         font-weight: 700;
-        letter-spacing: 2px;
+        color: #333;
+    }
+    
+    /* Разные цвета для карточек (оставляем для контраста) */
+    .card-autoresponder .card-header {
+        background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    }
+    
+    .card-basic .card-header {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    }
+    
+    .card-popular {
+        transform: scale(1.02);
+        border: 2px solid #ffd700;
+    }
+    
+    .card-popular .card-header {
+        background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+        position: relative;
+    }
+    
+    .popular-badge {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ffd700;
+        color: #333;
+        padding: 5px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 3;
+    }
+    
+    .card-premium .card-header {
+        background: linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%);
     }
     
     /* Тело карточки */
-    .card-body-custom {
-        padding: 30px;
+    .card-body {
+        padding: 30px 25px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
         background: white;
     }
     
     /* Цена */
     .price-tag {
-        font-size: 48px;
-        font-weight: 800;
-        color: #2c3e50;
-        margin: 20px 0;
         text-align: center;
+        font-size: 36px;
+        font-weight: 800;
+        color: #333;
+        margin-bottom: 20px;
     }
     
     .price-tag small {
-        font-size: 16px;
-        font-weight: 400;
-        color: #7f8c8d;
-    }
-    
-    /* Подзаголовок */
-    .price-subtitle {
-        text-align: center;
-        color: #7f8c8d;
-        margin-bottom: 20px;
         font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        font-weight: 400;
+        color: #666;
     }
     
     /* Список возможностей */
     .feature-list {
         list-style: none;
         padding: 0;
-        margin: 20px 0;
+        margin: 0 0 20px 0;
+        flex-grow: 1;
     }
     
     .feature-list li {
-        padding: 10px 0;
-        border-bottom: 1px solid #ecf0f1;
-        color: #34495e;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        color: #555;
+        display: flex;
+        align-items: center;
     }
     
     .feature-list li:last-child {
@@ -91,273 +251,302 @@
     
     .feature-list .included {
         color: #27ae60;
-        font-weight: 500;
     }
     
     .feature-list .not-included {
         color: #e74c3c;
-        text-decoration: line-through;
         opacity: 0.7;
     }
     
-    /* Кнопка - монохром */
+    .feature-list .included::before {
+        content: "✓ ";
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    
+    .feature-list .not-included::before {
+        content: "✗ ";
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    
+    /* Кнопка в карточке */
     .btn-order {
-        background: #34495e;
+        background: #4a90e2;
         color: white;
         border: none;
         border-radius: 50px;
-        padding: 12px 30px;
+        padding: 14px 20px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
         transition: all 0.3s ease;
         width: 100%;
         cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 16px;
     }
     
     .btn-order:hover {
-        background: #2c3e50;
-        transform: scale(1.02);
+        background: #357abd;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         color: white;
+        text-decoration: none;
     }
     
-    /* Выделение для популярного тарифа (тонкое) */
-    .popular-card {
-        border: 2px solid #3498db;
-        transform: scale(1.02);
+    /* Дополнительные услуги */
+    .extra-services {
+        margin-top: 60px;
+        position: relative;
+        z-index: 2;
+        padding: 0 20px;
     }
     
-    .popular-card .card-header-custom {
-        background: #2980b9;
-    }
-    
-    /* Бейдж "Популярное" */
-    .badge-custom {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: #3498db;
+    .extra-title {
         color: white;
-        padding: 5px 15px;
-        border-radius: 25px;
-        font-weight: bold;
-        font-size: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        z-index: 10;
-    }
-    
-    /* Бейдж для бюджетного тарифа */
-    .badge-budget {
-        background: #95a5a6;
-        color: white;
-    }
-    
-    /* Заголовок страницы */
-    .page-title {
-        color: white;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 28px;
+        font-weight: 700;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        margin-bottom: 20px;
     }
     
-    .page-subtitle {
-        color: rgba(255,255,255,0.9);
-        margin-bottom: 50px;
+    .extra-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
     }
     
-    /* Дополнительные услуги - монохром */
     .extra-card {
-        background: white;
-        border: none;
-        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
         padding: 25px;
         text-align: center;
-        height: 100%;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: all 0.3s ease;
+        color: white;
+    }
+    
+    .extra-card:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-5px);
     }
     
     .extra-card h5 {
-        color: #2c3e50;
-        font-weight: 700;
+        font-size: 20px;
+        font-weight: 600;
         margin-bottom: 15px;
     }
     
     .extra-card p {
-        color: #7f8c8d;
-        margin-bottom: 20px;
+        opacity: 0.9;
+        font-size: 14px;
+        margin-bottom: 15px;
     }
     
-    .extra-card h3 {
-        color: #2c3e50;
-        font-weight: 800;
+    .extra-card .price {
+        color: #ffd700;
+        font-size: 24px;
+        font-weight: 700;
+    }
+    
+    /* Примечание */
+    .note {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        max-width: 800px;
+        margin: 40px auto 0;
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        position: relative;
+        z-index: 2;
     }
     
     /* Адаптация для мобильных */
     @media (max-width: 768px) {
+        .top-nav-buttons {
+            top: 15px;
+            right: 15px;
+            gap: 8px;
+        }
+        
+        .nav-btn {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
         .pricing-page {
-            padding: 30px 0;
+            padding: 80px 0 40px 0;
         }
         
         .price-tag {
-            font-size: 36px;
+            font-size: 28px;
         }
         
-        .popular-card {
+        .card-popular {
             transform: scale(1);
+        }
+        
+        .cards-grid {
+            gap: 20px;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- ===== КНОПКИ В ПРАВОМ ВЕРХНЕМ УГЛУ - ЕДИНЫЙ СТИЛЬ ===== -->
+<div class="top-nav-buttons">
+    <!-- Кнопка Войти/Личный кабинет -->
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('personal_account') }}" class="nav-btn {% if request.endpoint == 'personal_account' %}active{% endif %}">ЛИЧНЫЙ КАБИНЕТ</a>
+    {% else %}
+        <a href="{{ url_for('email_login') }}" class="nav-btn {% if request.endpoint == 'email_login' %}active{% endif %}">ВОЙТИ</a>
+    {% endif %}
+    
+    <!-- Кнопка Цены (текущая страница) -->
+    <a href="{{ url_for('price') }}" class="nav-btn {% if request.endpoint == 'price' %}active{% endif %}">ЦЕНЫ</a>
+    
+    <!-- Кнопка Примеры работ -->
+    <a href="{{ url_for('examples') }}" class="nav-btn {% if request.endpoint == 'examples' %}active{% endif %}">ПРИМЕРЫ РАБОТ</a>
+    
+    <!-- Кнопка Поддержка -->
+    <a href="{{ url_for('support') }}" class="nav-btn {% if request.endpoint == 'support' %}active{% endif %}">ПОДДЕРЖКА</a>
+</div>
+
 <div class="pricing-page">
-    <div class="container">
-        <h1 class="text-center page-title">Цены на разработку ботов</h1>
-        <p class="text-center page-subtitle lead">Выберите подходящий тариф для вашего бизнеса</p>
+    <div class="container-fluid px-0">
+        <h1 class="page-title">Цены на разработку ботов</h1>
+        <p class="page-subtitle">Выберите подходящий тариф для вашего бизнеса</p>
         
-        <div class="row">
-            <!-- Тариф 1: Автоответчик (Бюджетный) -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="pricing-card">
-                    <div class="card-header-custom">
-                        <h3>АВТООТВЕТЧИК</h3>
+        <div class="cards-grid">
+            <!-- Тариф 1: Автоответчик -->
+            <div class="pricing-card card-autoresponder">
+                <div class="card-header">
+                    <h3>АВТООТВЕТЧИК</h3>
+                </div>
+                <div class="card-body">
+                    <div class="price-tag">
+                        500 ₽ <small>/мес</small>
                     </div>
-                    <div class="card-body-custom">
-                        <div class="price-tag">
-                            500 ₽
-                            <small>/мес</small>
-                        </div>
-                        <div class="price-subtitle">Для старта</div>
-                        <ul class="feature-list">
-                            <li class="included">✓ Простой автоответчик</li>
-                            <li class="included">✓ До 100 сообщений/день</li>
-                            <li class="included">✓ Настройка приветствия</li>
-                            <li class="included">✓ Команды /start, /help</li>
-                            <li class="not-included">✗ База данных</li>
-                            <li class="not-included">✗ Аналитика</li>
-                            <li class="not-included">✗ Интеграции</li>
-                        </ul>
-                        <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
-                    </div>
+                    <ul class="feature-list">
+                        <li class="included">Простой автоответчик</li>
+                        <li class="included">До 100 сообщений/день</li>
+                        <li class="included">Настройка приветствия</li>
+                        <li class="included">Команды /start, /help</li>
+                        <li class="not-included">База данных</li>
+                        <li class="not-included">Аналитика</li>
+                        <li class="not-included">Интеграции</li>
+                    </ul>
+                    <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
                 </div>
             </div>
             
             <!-- Тариф 2: Базовый -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="pricing-card">
-                    <div class="card-header-custom">
-                        <h3>БАЗОВЫЙ</h3>
+            <div class="pricing-card card-basic">
+                <div class="card-header">
+                    <h3>БАЗОВЫЙ</h3>
+                </div>
+                <div class="card-body">
+                    <div class="price-tag">
+                        3 000 ₽ <small>разово</small>
                     </div>
-                    <div class="card-body-custom">
-                        <div class="price-tag">
-                            3 000 ₽
-                            <small>разово</small>
-                        </div>
-                        <div class="price-subtitle">Для малого бизнеса</div>
-                        <ul class="feature-list">
-                            <li class="included">✓ 1 Telegram бот</li>
-                            <li class="included">✓ До 1000 пользователей</li>
-                            <li class="included">✓ Базовая аналитика</li>
-                            <li class="included">✓ Поддержка 2 недели</li>
-                            <li class="included">✓ Документация</li>
-                            <li class="not-included">✗ Интеграция с CRM</li>
-                            <li class="not-included">✗ ИИ-функции</li>
-                        </ul>
-                        <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
-                    </div>
+                    <ul class="feature-list">
+                        <li class="included">1 Telegram бот</li>
+                        <li class="included">До 1000 пользователей</li>
+                        <li class="included">Базовая аналитика</li>
+                        <li class="included">Поддержка 2 недели</li>
+                        <li class="included">Документация</li>
+                        <li class="not-included">Интеграция с CRM</li>
+                        <li class="not-included">ИИ-функции</li>
+                    </ul>
+                    <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
                 </div>
             </div>
             
-            <!-- Тариф 3: Стандарт (рекомендуемый) -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="pricing-card popular-card">
-                    <span class="badge-custom">ПОПУЛЯРНОЕ</span>
-                    <div class="card-header-custom">
-                        <h3>СТАНДАРТ</h3>
+            <!-- Тариф 3: Стандарт (Популярный) -->
+            <div class="pricing-card card-popular">
+                <span class="popular-badge">ПОПУЛЯРНОЕ</span>
+                <div class="card-header">
+                    <h3>СТАНДАРТ</h3>
+                </div>
+                <div class="card-body">
+                    <div class="price-tag">
+                        5 000 ₽ <small>разово</small>
                     </div>
-                    <div class="card-body-custom">
-                        <div class="price-tag">
-                            5 000 ₽
-                            <small>разово</small>
-                        </div>
-                        <div class="price-subtitle">Для растущего бизнеса</div>
-                        <ul class="feature-list">
-                            <li class="included">✓ 1 бот для Telegram/Discord</li>
-                            <li class="included">✓ До 10 000 пользователей</li>
-                            <li class="included">✓ Расширенная аналитика</li>
-                            <li class="included">✓ Интеграция с CRM</li>
-                            <li class="included">✓ Поддержка 1 месяц</li>
-                            <li class="included">✓ Админ-панель</li>
-                            <li class="not-included">✗ ИИ-ассистент</li>
-                        </ul>
-                        <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
-                    </div>
+                    <ul class="feature-list">
+                        <li class="included">1 бот для Telegram/Discord</li>
+                        <li class="included">До 10 000 пользователей</li>
+                        <li class="included">Расширенная аналитика</li>
+                        <li class="included">Интеграция с CRM</li>
+                        <li class="included">Поддержка 1 месяц</li>
+                        <li class="included">Админ-панель</li>
+                        <li class="not-included">ИИ-ассистент</li>
+                    </ul>
+                    <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
                 </div>
             </div>
             
             <!-- Тариф 4: Премиум -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="pricing-card">
-                    <div class="card-header-custom">
-                        <h3>ПРЕМИУМ</h3>
+            <div class="pricing-card card-premium">
+                <div class="card-header">
+                    <h3>ПРЕМИУМ</h3>
+                </div>
+                <div class="card-body">
+                    <div class="price-tag">
+                        12 000 ₽ <small>разово</small>
                     </div>
-                    <div class="card-body-custom">
-                        <div class="price-tag">
-                            12 000 ₽
-                            <small>разово</small>
-                        </div>
-                        <div class="price-subtitle">Для крупного бизнеса</div>
-                        <ul class="feature-list">
-                            <li class="included">✓ До 3 ботов на разных платформах</li>
-                            <li class="included">✓ Неограниченно пользователей</li>
-                            <li class="included">✓ ИИ-ассистент (GPT)</li>
-                            <li class="included">✓ Полная аналитика</li>
-                            <li class="included">✓ Интеграция с 1С/CRM</li>
-                            <li class="included">✓ Поддержка 3 месяца</li>
-                            <li class="included">✓ Индивидуальный дизайн</li>
-                        </ul>
-                        <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
-                    </div>
+                    <ul class="feature-list">
+                        <li class="included">До 3 ботов на разных платформах</li>
+                        <li class="included">Неограниченно пользователей</li>
+                        <li class="included">ИИ-ассистент (GPT)</li>
+                        <li class="included">Полная аналитика</li>
+                        <li class="included">Интеграция с 1С/CRM</li>
+                        <li class="included">Поддержка 3 месяца</li>
+                        <li class="included">Индивидуальный дизайн</li>
+                    </ul>
+                    <a href="{{ url_for('support') }}" class="btn-order">Выбрать</a>
                 </div>
             </div>
         </div>
         
-        <!-- Дополнительные услуги - монохром -->
-        <h2 class="text-center text-white mt-5 mb-4">Дополнительные услуги</h2>
-        
-        <div class="row">
-            <div class="col-md-4 mb-3">
+        <!-- Дополнительные услуги -->
+        <div class="extra-services">
+            <h2 class="extra-title">Дополнительные услуги</h2>
+            <div class="extra-grid">
                 <div class="extra-card">
                     <h5>Ежемесячная поддержка</h5>
                     <p>Техническая поддержка, обновления, резервное копирование</p>
-                    <h3>5 000 ₽/мес</h3>
+                    <div class="price">5 000 ₽/мес</div>
                 </div>
-            </div>
-            
-            <div class="col-md-4 mb-3">
+                
                 <div class="extra-card">
                     <h5>Интеграция с Instagram</h5>
                     <p>Подключение Instagram Direct API</p>
-                    <h3>15 000 ₽</h3>
+                    <div class="price">15 000 ₽</div>
                 </div>
-            </div>
-            
-            <div class="col-md-4 mb-3">
+                
                 <div class="extra-card">
                     <h5>WhatsApp Business API</h5>
                     <p>Официальное подключение к WhatsApp Business</p>
-                    <h3>20 000 ₽</h3>
+                    <div class="price">20 000 ₽</div>
                 </div>
             </div>
         </div>
         
         <!-- Примечание -->
-        <div class="alert alert-light text-center mt-4">
-            <p class="mb-0">Все цены указаны в российских рублях. Возможна индивидуальная разработка под ваши задачи.</p>
-        </div>
-        
-        <!-- Кнопка назад -->
-        <div class="text-center mt-4">
-            <a href="{{ url_for('index') }}" class="btn btn-light btn-lg">Вернуться на главную</a>
+        <div class="note">
+            <p>Все цены указаны в российских рублях. Возможна индивидуальная разработка под ваши задачи.</p>
         </div>
     </div>
 </div>

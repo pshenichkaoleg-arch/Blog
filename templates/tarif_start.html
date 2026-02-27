@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Тариф Старт{% endblock %}
+{% block title %}Тариф Стандарт{% endblock %}
 
 {% block styles %}
 <style>
@@ -85,30 +85,35 @@
         color: white;
     }
 
-    /* Фон с твоим изображением */
+    /* Градиентный фон */
     body {
+        background: linear-gradient(135deg, #000000 0%, #6e6559 50%, #ffffff 100%);
         margin: 0;
         padding: 0;
         min-height: 100vh;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background-image: url("{{ url_for('static', filename='images/BG_2.jpg') }}");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
         position: relative;
     }
 
-    /* Полупрозрачный слой для читаемости */
-    body::before {
-        content: '';
+    /* Анимированные частицы */
+    .particle {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(3px);
+        width: 6px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: float 20s infinite linear;
         z-index: 0;
+    }
+
+    @keyframes float {
+        from {
+            transform: translateY(100vh) rotate(0deg);
+        }
+        to {
+            transform: translateY(-100vh) rotate(360deg);
+        }
     }
 
     /* Скрываем стандартную навигацию */
@@ -320,7 +325,7 @@
     }
 
     .feature-text strong {
-        color: #ffd700;
+        color: #667eea;
         display: block;
         margin-bottom: 3px;
         font-size: 1.1rem;
@@ -404,12 +409,13 @@
         position: relative;
         overflow: hidden;
         text-align: center;
+        cursor: pointer;
+        border: none;
     }
 
     .btn-primary {
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
-        border: none;
         box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
     }
 
@@ -451,33 +457,27 @@
 
     /* Адаптация */
     @media (max-width: 768px) {
-    .logo {
-        top: 15px;
-        left: 15px;
-        max-width: 80px;
-    }
+        .logo {
+            top: 20px;
+            left: 20px;
+            max-width: 100px;
+        }
 
-    .nav-menu {
-        top: 15px;
-        right: 15px;
-        gap: 5px;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        max-width: 200px;
-    }
+        .nav-menu {
+            top: 20px;
+            right: 20px;
+            gap: 10px;
+        }
 
-    .nav-link {
-        font-size: 11px;
-        padding: 4px 8px;
-        white-space: nowrap;
-    }
-    
-    .home-button {
-        padding: 6px 15px;
-        font-size: 12px;
-        bottom: 15px;
-    }
-}
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .home-button {
+            padding: 8px 20px;
+            font-size: 13px;
+        }
 
         .card-header h1 {
             font-size: 2.5rem;
@@ -501,7 +501,7 @@
 {% block content %}
 <!-- Анимированные частицы -->
 {% for i in range(20) %}
-<div class="particle" style="position: fixed; left: {{ range(0, 100) | random }}%; width: {{ range(2, 8) | random }}px; height: {{ range(2, 8) | random }}px; background: rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; animation: float {{ range(10, 30) | random }}s infinite linear; animation-delay: -{{ range(0, 20) | random }}s; z-index: 0;"></div>
+<div class="particle" style="left: {{ range(0, 100) | random }}%; width: {{ range(2, 8) | random }}px; height: {{ range(2, 8) | random }}px; background: rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; animation: float {{ range(10, 30) | random }}s infinite linear; animation-delay: -{{ range(0, 20) | random }}s; z-index: 0;"></div>
 {% endfor %}
 
 <!-- Логотип -->
@@ -529,12 +529,12 @@
 <div class="container">
     <div class="tariff-card">
         <div class="card-header">
-            <h1>Старт</h1>
-            <p>Для небольших проектов</p>
+            <h1>Стандарт</h1>
+            <p>Для растущего бизнеса</p>
         </div>
         <div class="card-body">
             <div class="price-block">
-                <span class="price-amount">15 000 ₽ <small>/мес</small></span>
+                <span class="price-amount">5 000 ₽ <small>разово</small></span>
             </div>
 
             <div class="section-title">
@@ -544,29 +544,43 @@
                 <li>
                     <span class="feature-icon">✓</span>
                     <div class="feature-text">
-                        <strong>1 Telegram бот</strong>
-                        <span class="description">полностью настроенный под ваш бизнес</span>
+                        <strong>1 бот для Telegram/Discord</strong>
+                        <span class="description">поддержка двух платформ</span>
                     </div>
                 </li>
                 <li>
                     <span class="feature-icon">✓</span>
                     <div class="feature-text">
-                        <strong>До 1000 пользователей</strong>
-                        <span class="description">активная аудитория</span>
+                        <strong>До 10 000 пользователей</strong>
+                        <span class="description">масштабирование без ограничений</span>
                     </div>
                 </li>
                 <li>
                     <span class="feature-icon">✓</span>
                     <div class="feature-text">
-                        <strong>Базовая аналитика</strong>
-                        <span class="description">статистика действий, графики</span>
+                        <strong>Расширенная аналитика</strong>
+                        <span class="description">детальные отчёты, воронки продаж</span>
                     </div>
                 </li>
                 <li>
                     <span class="feature-icon">✓</span>
                     <div class="feature-text">
-                        <strong>Поддержка по email</strong>
-                        <span class="description">отвечаем в течение 24 часов</span>
+                        <strong>Интеграция с CRM</strong>
+                        <span class="description">синхронизация с вашей системой</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">✓</span>
+                    <div class="feature-text">
+                        <strong>Поддержка 1 месяц</strong>
+                        <span class="description">техническая поддержка</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">✓</span>
+                    <div class="feature-text">
+                        <strong>Админ-панель</strong>
+                        <span class="description">удобное управление ботом</span>
                     </div>
                 </li>
             </ul>
@@ -575,18 +589,42 @@
                 <span>➕</span> Дополнительные возможности
             </div>
             <ul class="extra-list">
-                <li><span class="extra-icon">➕</span> Подключение дополнительных платформ — от 5000 ₽</li>
-                <li><span class="extra-icon">➕</span> Интеграция с CRM — от 10 000 ₽</li>
-                <li><span class="extra-icon">➕</span> Индивидуальный дизайн — от 15 000 ₽</li>
+                <li><span class="extra-icon">➕</span> Подключение WhatsApp — от 10 000 ₽</li>
+                <li><span class="extra-icon">➕</span> ИИ-ассистент (базовый) — от 15 000 ₽</li>
+                <li><span class="extra-icon">➕</span> Индивидуальная разработка модулей — по запросу</li>
             </ul>
 
             <div class="btn-group">
-                <a href="{{ url_for('support') }}" class="btn-primary">Заказать</a>
+                <button onclick="createOrder('standard')" class="btn-primary">Заказать</button>
                 <a href="{{ url_for('index') }}#content" class="btn-secondary">Все тарифы</a>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function createOrder(tarifName) {
+        fetch(`/order/${tarifName}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`✅ Заказ ${data.order_number} успешно создан!`);
+                window.location.href = '/personal_account';
+            } else {
+                alert('❌ Ошибка при создании заказа');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Ошибка при создании заказа');
+        });
+    }
+</script>
 
 <style>
 @keyframes float {

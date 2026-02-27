@@ -95,7 +95,7 @@
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background-image: url("{{ url_for('static', filename='images/BG.jpg') }}");
         background-size: cover;
         background-position: center;
@@ -103,7 +103,6 @@
         position: relative;
     }
 
-    /* Полупрозрачный слой для читаемости */
     body::before {
         content: '';
         position: fixed;
@@ -126,7 +125,6 @@
         margin: 0 auto;
     }
 
-    /* Приветствие */
     .welcome-section {
         margin-bottom: 50px;
         animation: fadeInDown 0.8s ease;
@@ -165,7 +163,6 @@
         margin-bottom: 40px;
     }
 
-    /* Общие стили карточек */
     .card-glass {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
@@ -196,12 +193,10 @@
         }
     }
 
-    /* Задержки анимации для карточек */
     .card-1 { animation-delay: 0.1s; }
     .card-2 { animation-delay: 0.2s; }
     .card-3 { animation-delay: 0.3s; }
 
-    /* Карточка профиля */
     .profile-header {
         display: flex;
         align-items: center;
@@ -263,7 +258,6 @@
         opacity: 0.8;
     }
 
-    /* Карточка заказов */
     .section-header {
         display: flex;
         justify-content: space-between;
@@ -328,15 +322,26 @@
         background: rgba(255,255,255,0.2);
     }
 
-    .order-status.active {
-        background: #27ae60;
-    }
-
-    .order-status.pending {
+    .order-status.новый {
         background: #f39c12;
+        color: white;
     }
 
-    /* Статистика */
+    .order-status.в-обработке {
+        background: #3498db;
+        color: white;
+    }
+
+    .order-status.выполнен {
+        background: #27ae60;
+        color: white;
+    }
+
+    .order-status.отменён {
+        background: #e74c3c;
+        color: white;
+    }
+
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -362,7 +367,6 @@
         opacity: 0.8;
     }
 
-    /* Кнопка действий */
     .action-button {
         display: inline-block;
         padding: 12px 25px;
@@ -386,7 +390,7 @@
         color: white;
     }
 
-    /* Адаптация для мобильных */
+    /* Адаптация */
     @media (max-width: 768px) {
         .logo {
             top: 20px;
@@ -454,6 +458,9 @@
     <a href="{{ url_for('price') }}" class="nav-link {% if request.endpoint == 'price' %}active{% endif %}">ЦЕНЫ</a>
     <a href="{{ url_for('examples') }}" class="nav-link {% if request.endpoint == 'examples' %}active{% endif %}">ПРИМЕРЫ</a>
     <a href="{{ url_for('support') }}" class="nav-link {% if request.endpoint == 'support' %}active{% endif %}">ПОДДЕРЖКА</a>
+    {% if current_user.is_admin %}
+        <a href="{{ url_for('admin_panel') }}" class="nav-link">АДМИН</a>
+    {% endif %}
 </div>
 
 <!-- Кнопка "На главную" -->
@@ -479,58 +486,57 @@
                         <h3>{{ current_user.username }}</h3>
                         <p>{{ current_user.email }}</p>
                         <p>На сайте с {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+                        {% if current_user.is_admin %}
+                            <span class="badge" style="background: #27ae60;">👑 Администратор</span>
+                        {% endif %}
                     </div>
                 </div>
                 
                 <div class="info-grid">
                     <div class="info-item">
-                        <div class="info-value">3</div>
-                        <div class="info-label">Проекта</div>
+                        <div class="info-value">{{ orders|length }}</div>
+                        <div class="info-label">Заказов</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-value">12</div>
-                        <div class="info-label">API ключей</div>
+                        <div class="info-value">
+                            {% set total = 0 %}
+                            {% for order in orders %}
+                                {% if order.status == 'выполнен' %}
+                                    {% set total = total + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ total }}
+                        </div>
+                        <div class="info-label">Выполнено</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Карточка последних заказов -->
+            <!-- Карточка заказов -->
             <div class="card-glass card-2">
                 <div class="section-header">
-                    <h2>📦 Последние заказы</h2>
-                    <span class="badge">3 новых</span>
+                    <h2>📦 Ваши заказы</h2>
+                    <span class="badge">{{ orders|selectattr('status', 'equalto', 'новый')|list|length }} новых</span>
                 </div>
                 
                 <div class="orders-list">
-                    <div class="order-item">
-                        <div class="order-info">
-                            <h4>Telegram бот для ресторана</h4>
-                            <div class="order-date">Заказ #124 • 15.02.2026</div>
+                    {% if orders %}
+                        {% for order in orders[:5] %}
+                        <div class="order-item">
+                            <div class="order-info">
+                                <h4>{{ order.tariff }}</h4>
+                                <div class="order-date">{{ order.order_number }} • {{ order.created_at.strftime('%d.%m.%Y') }}</div>
+                            </div>
+                            <div class="order-price">{{ order.price }} ₽</div>
+                            <div class="order-status {{ order.status|replace(' ', '-') }}">{{ order.status }}</div>
                         </div>
-                        <div class="order-price">25 000 ₽</div>
-                        <div class="order-status active">Активен</div>
-                    </div>
-                    
-                    <div class="order-item">
-                        <div class="order-info">
-                            <h4>Discord модератор</h4>
-                            <div class="order-date">Заказ #123 • 10.02.2026</div>
-                        </div>
-                        <div class="order-price">35 000 ₽</div>
-                        <div class="order-status pending">В разработке</div>
-                    </div>
-                    
-                    <div class="order-item">
-                        <div class="order-info">
-                            <h4>Бот поддержки 24/7</h4>
-                            <div class="order-date">Заказ #121 • 01.02.2026</div>
-                        </div>
-                        <div class="order-price">15 000 ₽</div>
-                        <div class="order-status active">Активен</div>
-                    </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="text-align: center; opacity: 0.8;">У вас пока нет заказов</p>
+                    {% endif %}
                 </div>
                 
-                <a href="#" class="action-button">Все заказы →</a>
+                <a href="{{ url_for('price') }}" class="action-button">Заказать бота →</a>
             </div>
 
             <!-- Карточка статистики -->
@@ -541,49 +547,26 @@
                 
                 <div class="stats-grid">
                     <div class="stat-item">
-                        <div class="stat-value">127</div>
-                        <div class="stat-label">Запросов сегодня</div>
+                        <div class="stat-value">{{ orders|selectattr('status', 'equalto', 'новый')|list|length }}</div>
+                        <div class="stat-label">В обработке</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">2.4k</div>
-                        <div class="stat-label">Всего запросов</div>
+                        <div class="stat-value">{{ orders|selectattr('status', 'equalto', 'в обработке')|list|length }}</div>
+                        <div class="stat-label">В работе</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">98%</div>
-                        <div class="stat-label">Аптайм</div>
+                        <div class="stat-value">{{ orders|selectattr('status', 'equalto', 'выполнен')|list|length }}</div>
+                        <div class="stat-label">Выполнено</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">4.8</div>
-                        <div class="stat-label">Ср. оценка</div>
+                        <div class="stat-value">{{ orders|sum(attribute='price') }} ₽</div>
+                        <div class="stat-label">Всего потрачено</div>
                     </div>
                 </div>
-
-                <div style="margin-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span>Использовано API</span>
-                        <span>65%</span>
-                    </div>
-                    <div style="height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px;">
-                        <div style="width: 65%; height: 100%; background: linear-gradient(90deg, #ffbb00, #3a6792); border-radius: 4px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Дополнительная карточка (на всю ширину) -->
-        <div class="card-glass" style="animation: fadeInUp 0.8s ease 0.4s both;">
-            <div class="section-header">
-                <h2>⚡ Быстрые действия</h2>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <a href="{{ url_for('create') }}" class="action-button" style="margin-top: 0;">➕ Новый проект</a>
-                <a href="#" class="action-button" style="margin-top: 0;">📄 Документация</a>
-                <a href="{{ url_for('support') }}" class="action-button" style="margin-top: 0;">💬 Поддержка</a>
             </div>
         </div>
 
     {% else %}
-        <!-- Если пользователь не авторизован -->
         <div class="welcome-section" style="text-align: center;">
             <h1 class="welcome-title">Личный кабинет</h1>
             <p class="welcome-subtitle">Войдите или зарегистрируйтесь, чтобы получить доступ</p>
@@ -591,7 +574,6 @@
 
         <div style="display: flex; gap: 20px; justify-content: center;">
             <a href="{{ url_for('email_login') }}" class="action-button" style="width: auto; padding: 15px 40px;">Войти</a>
-            <a href="{{ url_for('register') }}" class="action-button" style="width: auto; padding: 15px 40px; background: rgba(255,255,255,0.2);">Регистрация</a>
         </div>
     {% endif %}
 </div>

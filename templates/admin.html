@@ -1,0 +1,586 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель{% endblock %}
+
+{% block styles %}
+<style>
+    /* Скрываем стандартную навигацию */
+    .navbar {
+        display: none !important;
+    }
+
+    /* Логотип */
+    .logo {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        z-index: 1001;
+        max-width: 150px;
+    }
+    
+    .logo img {
+        width: 100%;
+        height: auto;
+        max-height: 50px;
+        object-fit: contain;
+        transition: opacity 0.3s ease;
+    }
+    
+    .logo img:hover {
+        opacity: 0.8;
+    }
+
+    /* Меню навигации */
+    .nav-menu {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        display: flex;
+        gap: 20px;
+        z-index: 1000;
+    }
+
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 8px 16px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        font-weight: 600;
+    }
+
+    /* Кнопка "На главную" */
+    .home-button {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .home-button:hover {
+        background: rgba(0, 0, 0, 0.4);
+        transform: translateX(-50%) translateY(-2px);
+        color: white;
+    }
+
+    /* Фон */
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        position: relative;
+    }
+
+    /* Основной контейнер */
+    .admin-container {
+        padding: 100px 30px 100px 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .admin-title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .admin-subtitle {
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 40px;
+    }
+
+    /* Табы */
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        padding: 12px 25px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 30px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .tab-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, #ffbb00, #3a6792);
+        border-color: transparent;
+    }
+
+    /* Секции */
+    .admin-section {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .admin-section.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Карточки */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        color: white;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        opacity: 0.8;
+        font-size: 0.9rem;
+    }
+
+    /* Таблицы */
+    .table-container {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 15px;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        color: white;
+    }
+
+    th {
+        text-align: left;
+        padding: 15px 20px;
+        background: rgba(0,0,0,0.3);
+        font-weight: 600;
+    }
+
+    td {
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    tr:hover {
+        background: rgba(255,255,255,0.05);
+    }
+
+    /* Статусы */
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-новый {
+        background: #f39c12;
+        color: white;
+    }
+
+    .status-в-обработке {
+        background: #3498db;
+        color: white;
+    }
+
+    .status-выполнен {
+        background: #27ae60;
+        color: white;
+    }
+
+    .status-отменён {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .status-прочитано {
+        background: #95a5a6;
+        color: white;
+    }
+
+    .status-отвечено {
+        background: #9b59b6;
+        color: white;
+    }
+
+    /* Селект статуса */
+    .status-select {
+        padding: 6px 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        color: white;
+        cursor: pointer;
+    }
+
+    .status-select option {
+        background: #16213e;
+        color: white;
+    }
+
+    /* Уведомление о новых заказах */
+    .notification-badge {
+        position: relative;
+    }
+
+    .notification-badge::after {
+        content: attr(data-count);
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #e74c3c;
+        color: white;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+    }
+
+    /* Адаптация */
+    @media (max-width: 768px) {
+        .logo {
+            top: 20px;
+            left: 20px;
+            max-width: 100px;
+        }
+
+        .nav-menu {
+            top: 20px;
+            right: 20px;
+            gap: 10px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .home-button {
+            padding: 8px 20px;
+            font-size: 13px;
+        }
+
+        .admin-container {
+            padding: 80px 15px 80px 15px;
+        }
+
+        .admin-title {
+            font-size: 2rem;
+        }
+
+        table {
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        .status-select {
+            padding: 4px 6px;
+            font-size: 11px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Логотип -->
+<div class="logo">
+    <a href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Логотип">
+    </a>
+</div>
+
+<!-- Меню навигации -->
+<div class="nav-menu">
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('personal_account') }}" class="nav-link">ЛИЧНЫЙ КАБИНЕТ</a>
+    {% else %}
+        <a href="{{ url_for('email_login') }}" class="nav-link">ВОЙТИ</a>
+    {% endif %}
+    <a href="{{ url_for('price') }}" class="nav-link">ЦЕНЫ</a>
+    <a href="{{ url_for('examples') }}" class="nav-link">ПРИМЕРЫ</a>
+    <a href="{{ url_for('support') }}" class="nav-link">ПОДДЕРЖКА</a>
+    <a href="{{ url_for('admin_panel') }}" class="nav-link active">АДМИН</a>
+</div>
+
+<!-- Кнопка "На главную" -->
+<a href="{{ url_for('index') }}" class="home-button">← НА ГЛАВНУЮ</a>
+
+<div class="admin-container">
+    <h1 class="admin-title">👑 Админ-панель</h1>
+    <p class="admin-subtitle">Управление заказами, сообщениями и пользователями</p>
+
+    <!-- Статистика -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ orders|length }}</div>
+            <div class="stat-label">Всего заказов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ orders|selectattr('status', 'equalto', 'новый')|list|length }}</div>
+            <div class="stat-label">Новых заказов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ messages|length }}</div>
+            <div class="stat-label">Сообщений</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ messages|selectattr('status', 'equalto', 'новый')|list|length }}</div>
+            <div class="stat-label">Непрочитанных</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ users|length }}</div>
+            <div class="stat-label">Пользователей</div>
+        </div>
+    </div>
+
+    <!-- Табы -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('orders')">📦 Заказы</button>
+        <button class="tab-btn" onclick="showTab('messages')">💬 Сообщения</button>
+        <button class="tab-btn" onclick="showTab('users')">👤 Пользователи</button>
+    </div>
+
+    <!-- Секция заказов -->
+    <div id="orders" class="admin-section active">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Номер</th>
+                        <th>Клиент</th>
+                        <th>Тариф</th>
+                        <th>Сумма</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><strong>{{ order.order_number }}</strong></td>
+                        <td>{{ order.customer.username }}<br><small>{{ order.customer.email }}</small></td>
+                        <td>{{ order.tariff }}</td>
+                        <td>{{ order.price }} ₽</td>
+                        <td>{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.status|replace(' ', '-') }}">{{ order.status }}</span>
+                        </td>
+                        <td>
+                            <select class="status-select" onchange="updateOrderStatus({{ order.id }}, this.value)">
+                                <option value="новый" {% if order.status == 'новый' %}selected{% endif %}>Новый</option>
+                                <option value="в обработке" {% if order.status == 'в обработке' %}selected{% endif %}>В обработке</option>
+                                <option value="выполнен" {% if order.status == 'выполнен' %}selected{% endif %}>Выполнен</option>
+                                <option value="отменён" {% if order.status == 'отменён' %}selected{% endif %}>Отменён</option>
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Секция сообщений -->
+    <div id="messages" class="admin-section">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Email</th>
+                        <th>Сообщение</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in messages %}
+                    <tr>
+                        <td>#{{ msg.id }}</td>
+                        <td>{{ msg.name }}</td>
+                        <td><a href="mailto:{{ msg.email }}" style="color: white;">{{ msg.email }}</a></td>
+                        <td>{{ msg.message[:50] }}...</td>
+                        <td>{{ msg.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                        <td>
+                            <span class="status-badge status-{{ msg.status|replace(' ', '-') }}">{{ msg.status }}</span>
+                        </td>
+                        <td>
+                            {% if msg.status == 'новый' %}
+                            <button onclick="markMessageRead({{ msg.id }})" class="status-select" style="background: #27ae60;">✓ Прочитано</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Секция пользователей -->
+    <div id="users" class="admin-section">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Email</th>
+                        <th>Дата регистрации</th>
+                        <th>Заказов</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>#{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.created_at.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ user.orders|length }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                            <span class="status-badge status-выполнен">Админ</span>
+                            {% else %}
+                            <span class="status-badge status-новый">Пользователь</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Переключение табов
+    function showTab(tabName) {
+        // Скрываем все секции
+        document.querySelectorAll('.admin-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Убираем активный класс у всех кнопок
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Показываем выбранную секцию
+        document.getElementById(tabName).classList.add('active');
+        
+        // Активируем кнопку
+        event.target.classList.add('active');
+    }
+
+    // Обновление статуса заказа
+    function updateOrderStatus(orderId, newStatus) {
+        fetch(`/admin/order/${orderId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({status: newStatus})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Обновляем отображение статуса
+                location.reload();
+            }
+        });
+    }
+
+    // Отметить сообщение как прочитанное
+    function markMessageRead(messageId) {
+        fetch(`/admin/message/${messageId}/read`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+
+    // Проверка новых уведомлений каждые 30 секунд (для админа)
+    setInterval(() => {
+        fetch('/api/notifications')
+            .then(response => response.json())
+            .then(data => {
+                if (data.total > 0) {
+                    // Обновляем заголовок страницы
+                    document.title = `(${data.total}) Админ-панель`;
+                    
+                    // Можно добавить звуковое уведомление или popup
+                    console.log('Новые уведомления:', data);
+                }
+            });
+    }, 30000);
+</script>
+{% endblock %}

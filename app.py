@@ -2,7 +2,7 @@ import os
 import secrets
 import threading
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_migrate import Migrate
@@ -25,13 +25,12 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # ==================== НАСТРОЙКИ ПОЧТЫ (MAIL.RU) ====================
-# Прописываем напрямую для надёжности
 app.config['MAIL_SERVER'] = 'smtp.mail.ru'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'pshenichka.oleg@mail.ru'
-app.config['MAIL_PASSWORD'] = '7QtaWPZC4Q1JOBHceaTG'  # ВСТАВЬТЕ СЮДА ПАРОЛЬ!
+app.config['MAIL_PASSWORD'] = 'ваш-пароль-приложения'  # ВСТАВЬТЕ СЮДА ПАРОЛЬ!
 app.config['MAIL_DEFAULT_SENDER'] = 'pshenichka.oleg@mail.ru'
 
 print("=== НАСТРОЙКИ ПОЧТЫ ===")
@@ -41,9 +40,7 @@ print(f"MAIL_DEFAULT_SENDER: {app.config['MAIL_DEFAULT_SENDER']}")
 print(f"MAIL_PASSWORD загружен: {'Да' if app.config['MAIL_PASSWORD'] else 'Нет'}")
 print("=======================")
 
-# Инициализация Mail
 mail = Mail(app)
-
 db = SQLAlchemy(app)
 
 # Инициализация Flask-Login
@@ -96,6 +93,8 @@ class User(db.Model, UserMixin):
     avatar = db.Column(db.String(200), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     posts = db.relationship('Post', backref='author', lazy=True)
+    orders = db.relationship('Order', backref='customer', lazy=True)
+    is_admin = db.Column(db.Boolean, default=False)  # Флаг администратора
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -122,6 +121,35 @@ class UserLog(db.Model):
 
     def __repr__(self):
         return f'<UserLog {self.action} at {self.timestamp}>'
+
+
+# ==================== НОВАЯ МОДЕЛЬ ЗАКАЗОВ ====================
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_number = db.Column(db.String(20), unique=True, nullable=False)  # Номер заказа (например, #ORD-001)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    tariff = db.Column(db.String(50), nullable=False)  # Название тарифа (Старт, Бизнес, Корпоративный)
+    price = db.Column(db.Integer, nullable=False)  # Цена
+    status = db.Column(db.String(20), default='новый')  # новый, в обработке, выполнен, отменён
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    notes = db.Column(db.Text, nullable=True)  # Примечания к заказу
+    
+    def __repr__(self):
+        return f'<Order {self.order_number}>'
+
+
+# ==================== НОВАЯ МОДЕЛЬ СООБЩЕНИЙ ПОДДЕРЖКИ ====================
+class SupportMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default='новый')  # новый, прочитано, отвечено
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Если сообщение от авторизованного
+    
+    def __repr__(self):
+        return f'<SupportMessage {self.id} from {self.name}>'
 
 
 # ----------------------------------------------------------------------
@@ -157,7 +185,6 @@ def send_async_email(app, msg):
 def send_support_email(name, email, message):
     """Отправка письма из формы поддержки"""
     try:
-        # Явно указываем отправителя
         msg = Message(
             subject=f'📬 Новое сообщение в поддержку от {name}',
             sender='pshenichka.oleg@mail.ru',
@@ -186,6 +213,36 @@ def send_support_email(name, email, message):
         
     except Exception as e:
         print(f"❌ Ошибка при подготовке письма: {str(e)}")
+        return False
+
+
+def send_order_notification(order, user, tariff):
+    """Отправка уведомления о новом заказе"""
+    try:
+        msg = Message(
+            subject=f'🛒 Новый заказ: {order.order_number}',
+            sender='pshenichka.oleg@mail.ru',
+            recipients=['pshenichka.oleg@mail.ru']
+        )
+        
+        msg.body = f"""
+Новый заказ на сайте!
+
+📦 Номер заказа: {order.order_number}
+👤 Клиент: {user.username} ({user.email})
+📋 Тариф: {tariff}
+💰 Сумма: {order.price} ₽
+📅 Дата: {order.created_at.strftime('%d.%m.%Y %H:%M')}
+Статус: {order.status}
+
+---
+Перейдите в админ-панель для обработки заказа.
+        """
+        
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"❌ Ошибка отправки уведомления о заказе: {str(e)}")
         return False
 
 
@@ -219,6 +276,17 @@ def support():
         email = request.form['email']
         message = request.form['message']
         
+        # Сохраняем сообщение в базу данных
+        support_msg = SupportMessage(
+            name=name,
+            email=email,
+            message=message,
+            user_id=current_user.id if current_user.is_authenticated else None
+        )
+        db.session.add(support_msg)
+        db.session.commit()
+        
+        # Отправляем письмо
         if send_support_email(name, email, message):
             flash('✅ Спасибо за обращение! Мы получили ваше сообщение и ответим в ближайшее время.', 'success')
         else:
@@ -233,7 +301,9 @@ def support():
 @login_required
 def personal_account():
     """Личный кабинет пользователя"""
-    return render_template('personal_account.html')
+    # Получаем реальные заказы пользователя
+    user_orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    return render_template('personal_account.html', orders=user_orders)
 
 
 @app.route('/post/<int:post_id>')
@@ -267,6 +337,139 @@ def logout():
     logout_user()
     flash('Вы вышли из системы.', 'info')
     return redirect(url_for('index'))
+
+
+# ==================== НОВЫЙ МАРШРУТ ДЛЯ ОФОРМЛЕНИЯ ЗАКАЗА ====================
+@app.route('/order/<tarif_name>', methods=['POST'])
+@login_required
+def create_order(tarif_name):
+    """Создание нового заказа"""
+    # Получаем цену в зависимости от тарифа
+    prices = {
+        'start': 15000,
+        'business': 35000,
+        'corporate': 75000
+    }
+    
+    names = {
+        'start': 'Старт',
+        'business': 'Бизнес',
+        'corporate': 'Корпоративный'
+    }
+    
+    if tarif_name not in prices:
+        flash('❌ Неверный тариф', 'danger')
+        return redirect(url_for('price'))
+    
+    # Генерируем номер заказа
+    last_order = Order.query.order_by(Order.id.desc()).first()
+    if last_order:
+        last_num = int(last_order.order_number.split('-')[1])
+        new_num = last_num + 1
+    else:
+        new_num = 1
+    
+    order_number = f"ORD-{new_num:03d}"
+    
+    # Создаём заказ
+    order = Order(
+        order_number=order_number,
+        user_id=current_user.id,
+        tariff=names[tarif_name],
+        price=prices[tarif_name],
+        status='новый'
+    )
+    
+    db.session.add(order)
+    db.session.commit()
+    
+    # Отправляем уведомление админу
+    send_order_notification(order, current_user, names[tarif_name])
+    
+    flash(f'✅ Заказ {order_number} успешно создан! Мы свяжемся с вами в ближайшее время.', 'success')
+    
+    # Если это AJAX запрос
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'success': True,
+            'order_number': order_number,
+            'message': 'Заказ успешно создан'
+        })
+    
+    return redirect(url_for('personal_account'))
+
+
+# ==================== НОВЫЙ МАРШРУТ ДЛЯ АДМИН-ПАНЕЛИ ====================
+@app.route('/admin')
+@login_required
+def admin_panel():
+    """Админ-панель"""
+    # Проверяем, является ли пользователь админом
+    if not current_user.is_admin:
+        flash('❌ У вас нет доступа к этой странице', 'danger')
+        return redirect(url_for('index'))
+    
+    # Получаем все заказы
+    orders = Order.query.order_by(Order.created_at.desc()).all()
+    
+    # Получаем все сообщения поддержки
+    messages = SupportMessage.query.order_by(SupportMessage.created_at.desc()).all()
+    
+    # Получаем пользователей
+    users = User.query.order_by(User.created_at.desc()).all()
+    
+    return render_template('admin.html', orders=orders, messages=messages, users=users)
+
+
+@app.route('/admin/order/<int:order_id>/status', methods=['POST'])
+@login_required
+def update_order_status(order_id):
+    """Обновление статуса заказа"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Доступ запрещён'}), 403
+    
+    order = Order.query.get_or_404(order_id)
+    data = request.get_json()
+    new_status = data.get('status')
+    
+    if new_status in ['новый', 'в обработке', 'выполнен', 'отменён']:
+        order.status = new_status
+        db.session.commit()
+        return jsonify({'success': True, 'new_status': new_status})
+    
+    return jsonify({'error': 'Неверный статус'}), 400
+
+
+@app.route('/admin/message/<int:message_id>/read', methods=['POST'])
+@login_required
+def mark_message_read(message_id):
+    """Отметить сообщение как прочитанное"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Доступ запрещён'}), 403
+    
+    message = SupportMessage.query.get_or_404(message_id)
+    message.status = 'прочитано'
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+
+# ==================== API ДЛЯ ПОЛУЧЕНИЯ УВЕДОМЛЕНИЙ ====================
+@app.route('/api/notifications')
+@login_required
+def get_notifications():
+    """Получение количества новых заказов и сообщений (для админа)"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Доступ запрещён'}), 403
+    
+    new_orders = Order.query.filter_by(status='новый').count()
+    new_messages = SupportMessage.query.filter_by(status='новый').count()
+    
+    return jsonify({
+        'new_orders': new_orders,
+        'new_messages': new_messages,
+        'total': new_orders + new_messages
+    })
 
 
 # ==================== OAuth МАРШРУТЫ ====================
@@ -463,7 +666,7 @@ def tarif_corporate():
     return render_template('tarif_corporate.html')
 
 
-# ==================== ТЕСТОВЫЕ МАРШРУТЫ ====================
+# ==================== ТЕСТОВЫЙ МАРШРУТ ====================
 
 @app.route('/test-mailru')
 def test_mailru():
@@ -503,8 +706,32 @@ def page_not_found(e):
 # СОЗДАНИЕ ТАБЛИЦ ПРИ ЗАПУСКЕ
 # ----------------------------------------------------------------------
 with app.app_context():
+    # Создаём все таблицы (если их нет)
     db.create_all()
-
+    print("✅ Таблицы созданы (проверка)")
+    
+    # Пытаемся добавить колонку is_admin, если её нет
+    from sqlalchemy import text
+    try:
+        # Проверяем, есть ли колонка is_admin
+        db.session.execute(text("SELECT is_admin FROM user LIMIT 1")).fetchone()
+        print("✅ Колонка is_admin уже существует")
+    except Exception:
+        print("⚠️ Колонка is_admin не найдена, добавляем...")
+        db.session.execute(text("ALTER TABLE user ADD COLUMN is_admin BOOLEAN DEFAULT 0"))
+        db.session.commit()
+        print("✅ Колонка is_admin успешно добавлена")
+    
+    # Теперь назначаем админа
+    try:
+        admin = User.query.filter_by(is_admin=True).first()
+        if not admin and User.query.count() > 0:
+            first_user = User.query.first()
+            first_user.is_admin = True
+            db.session.commit()
+            print(f"✅ Пользователь {first_user.username} назначен администратором")
+    except Exception as e:
+        print(f"ℹ️ Информация при назначении админа: {e}")
 
 # ----------------------------------------------------------------------
 # ЗАПУСК

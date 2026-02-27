@@ -451,27 +451,33 @@
 
     /* Адаптация */
     @media (max-width: 768px) {
-        .logo {
-            top: 20px;
-            left: 20px;
-            max-width: 100px;
-        }
+    .logo {
+        top: 15px;
+        left: 15px;
+        max-width: 80px;
+    }
 
-        .nav-menu {
-            top: 20px;
-            right: 20px;
-            gap: 10px;
-        }
+    .nav-menu {
+        top: 15px;
+        right: 15px;
+        gap: 5px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        max-width: 200px;
+    }
 
-        .nav-link {
-            font-size: 13px;
-            padding: 6px 12px;
-        }
-
-        .home-button {
-            padding: 8px 20px;
-            font-size: 13px;
-        }
+    .nav-link {
+        font-size: 11px;
+        padding: 4px 8px;
+        white-space: nowrap;
+    }
+    
+    .home-button {
+        padding: 6px 15px;
+        font-size: 12px;
+        bottom: 15px;
+    }
+}
 
         .card-header h1 {
             font-size: 2.5rem;

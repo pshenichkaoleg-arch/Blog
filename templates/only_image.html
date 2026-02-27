@@ -18,6 +18,28 @@
             scroll-behavior: smooth;
         }
         
+        /* Логотип */
+        .logo {
+            position: fixed;
+            top: 30px;
+            left: 50px;
+            z-index: 1001;
+            max-width: 200px;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: auto;
+            max-height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            transition: transform 0.3s ease;
+        }
+        
+        .logo img:hover {
+            transform: scale(1.05);
+        }
+        
         /* Верхняя часть с изображением */
         .hero-section {
             position: relative;
@@ -41,23 +63,6 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.4);
             z-index: 1;
-        }
-        
-        /* Логотип */
-        .logo {
-            position: absolute;
-            top: 30px;
-            left: 50px;
-            z-index: 3;
-            max-width: 200px;
-        }
-        
-        .logo img {
-            width: 100%;
-            height: auto;
-            max-height: 80px;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
         }
         
         /* Текст на изображении */
@@ -127,12 +132,12 @@
         
         .button-support {
             top: 5%;
-            right: 12.5%;
+            right: 17.5%;
         }
         
         .button-login {
             top: 5%;
-            right: 5%;
+            right: 10%;
         }
         
         /* Кнопка для скролла вниз */
@@ -168,8 +173,7 @@
         .content-section {
             width: 100%;
             padding: 80px 20px;
-            /* НОВЫЙ ГРАДИЕНТ */
-            background: linear-gradient(135deg, #ffbb00 0%, #3a6792 50%, #8eecbb 100%);
+            background: linear-gradient(135deg, #000000 0%, #6e6559 50%, #ffffff 100%);
             color: white;
         }
         
@@ -368,62 +372,110 @@
             to { opacity: 1; }
         }
         
-        /* Адаптация */
+        /* Адаптация для мобильных */
         @media (max-width: 768px) {
             .logo {
-                top: 20px;
-                left: 20px;
-                max-width: 150px;
+                top: 15px;
+                left: 15px;
+                max-width: 80px;
+            }
+            
+            .logo img {
+                max-height: 40px;
             }
             
             .hero-title {
-                font-size: 32px;
+                font-size: 28px;
             }
             
             .hero-subtitle {
-                font-size: 18px;
+                font-size: 16px;
+            }
+            
+            .hero-description {
+                font-size: 14px;
+                margin-bottom: 20px;
             }
             
             .image-button {
-                padding: 8px 15px;
-                font-size: 12px;
+                padding: 6px 10px;
+                font-size: 10px;
             }
             
             .button-support {
-                top: 5%;
-                right: 5%;
+                top: 10px;
+                right: 10px;
             }
             
             .button-login {
-                top: 5%;
-                right: 10%;
+                top: 10px;
+                right: 80px;
+            }
+            
+            .scroll-down {
+                bottom: 15px;
+                padding: 6px 12px;
+                font-size: 11px;
             }
             
             .card {
-                padding: 30px 20px;
+                padding: 20px 15px;
             }
             
             .card-price {
-                font-size: 28px;
+                font-size: 24px;
             }
             
             .examples-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .example-card {
+                height: 250px;
+            }
+        }
+        
+        /* Для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .button-login {
+                right: 70px;
+            }
+            
+            .image-button {
+                padding: 4px 8px;
+                font-size: 9px;
+            }
+            
+            .hero-title {
+                font-size: 24px;
+            }
+            
+            .hero-subtitle {
+                font-size: 14px;
+            }
+            
+            .hero-description {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Логотип -->
+    <div class="logo">
+        <a href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Логотип">
+        </a>
+    </div>
+
     <!-- Верхняя часть с изображением -->
     <div class="hero-section">
         <img src="{{ url_for('static', filename='images/main.png') }}" 
              alt="Главное изображение" 
              class="fullscreen-image">
+        
         <div class="overlay"></div>
-        <div class="logo">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" 
-                 alt="Логотип">
-        </div>
+        
         <div class="hero-content">
             <h1 class="hero-title">СОЗДАНИЕ БОТОВ</h1>
             <p class="hero-subtitle">Автоматизация без границ</p>
@@ -433,6 +485,7 @@
             </p>
         </div>
         
+        <!-- Кнопки на изображении -->
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('personal_account') }}" class="image-button button-login">ЛИЧНЫЙ КАБИНЕТ</a>
         {% else %}
@@ -441,16 +494,19 @@
         
         <a href="{{ url_for('support') }}" class="image-button button-support">ПОДДЕРЖКА</a>
         
+        <!-- Кнопка для скролла вниз -->
         <a href="#content" class="scroll-down">▼ Прокрутите вниз ▼</a>
     </div>
 
+    <!-- Прокручиваемая часть с контентом -->
     <div id="content">
-        <!-- Блок с тарифами (фон изменён) -->
+        <!-- Блок с тарифами -->
         <div class="content-section">
             <h2 class="section-title">Тарифы и возможности</h2>
             <p class="section-subtitle">Выберите подходящий план для вашего бизнеса</p>
             
             <div class="cards-grid">
+                <!-- Карточка 1: Старт -->
                 <div class="card">
                     <div class="card-icon">🚀</div>
                     <h3 class="card-title">Старт</h3>
@@ -463,6 +519,8 @@
                     </ul>
                     <a href="{{ url_for('tarif_start') }}" class="card-button">Подробнее</a>
                 </div>
+                
+                <!-- Карточка 2: Бизнес -->
                 <div class="card">
                     <div class="card-icon">💼</div>
                     <h3 class="card-title">Бизнес</h3>
@@ -476,6 +534,8 @@
                     </ul>
                     <a href="{{ url_for('tarif_business') }}" class="card-button">Подробнее</a>
                 </div>
+                
+                <!-- Карточка 3: Корпоративный -->
                 <div class="card">
                     <div class="card-icon">🏢</div>
                     <h3 class="card-title">Корпоративный</h3>
@@ -493,10 +553,12 @@
             </div>
         </div>
         
-        <!-- Блок с примерами работ (без изменений) -->
+        <!-- Блок с примерами работ -->
         <div class="examples-section">
             <h2 class="examples-title">Примеры наших работ</h2>
+            
             <div class="examples-grid">
+                <!-- Пример 1 -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work1.jpg') }}" alt="Работа 1" class="example-image">
                     <div class="example-overlay">
@@ -504,6 +566,8 @@
                         <p class="example-description">Бронирование столиков, меню, отзывы</p>
                     </div>
                 </div>
+                
+                <!-- Пример 2 -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work2.jpg') }}" alt="Работа 2" class="example-image">
                     <div class="example-overlay">
@@ -511,6 +575,8 @@
                         <p class="example-description">Каталог, корзина, оплата, доставка</p>
                     </div>
                 </div>
+                
+                <!-- Пример 3 -->
                 <div class="example-card" onclick="window.location.href='{{ url_for('examples') }}'">
                     <img src="{{ url_for('static', filename='images/works/work3.jpg') }}" alt="Работа 3" class="example-image">
                     <div class="example-overlay">
@@ -519,6 +585,7 @@
                     </div>
                 </div>
             </div>
+            
             <div style="text-align: center; margin-top: 50px;">
                 <a href="{{ url_for('examples') }}" class="card-button" style="background: #667eea; color: white;">Смотреть все работы</a>
             </div>

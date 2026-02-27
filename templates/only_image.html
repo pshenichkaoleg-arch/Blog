@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Главная</title>
     <style>
         * {
@@ -121,6 +121,7 @@
             z-index: 3;
             text-transform: uppercase;
             letter-spacing: 1px;
+            white-space: nowrap;
         }
         
         .image-button:hover {
@@ -132,12 +133,12 @@
         
         .button-support {
             top: 5%;
-            right: 17.5%;
+            right: 14%;
         }
         
         .button-login {
             top: 5%;
-            right: 10%;
+            right: 5%;
         }
         
         /* Кнопка для скролла вниз */
@@ -372,12 +373,25 @@
             to { opacity: 1; }
         }
         
-        /* Адаптация для мобильных */
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+        
+        /* Для планшетов */
+        @media (max-width: 1024px) {
+            .button-support {
+                right: 15%;
+            }
+            
+            .button-login {
+                right: 3%;
+            }
+        }
+        
+        /* Для телефонов */
         @media (max-width: 768px) {
             .logo {
                 top: 15px;
                 left: 15px;
-                max-width: 80px;
+                max-width: 100px;
             }
             
             .logo img {
@@ -385,45 +399,52 @@
             }
             
             .hero-title {
-                font-size: 28px;
+                font-size: 32px;
+                margin-bottom: 10px;
             }
             
             .hero-subtitle {
-                font-size: 16px;
+                font-size: 18px;
+                margin-bottom: 15px;
             }
             
             .hero-description {
                 font-size: 14px;
-                margin-bottom: 20px;
+                margin-bottom: 25px;
             }
             
-            .image-button {
-                padding: 6px 10px;
-                font-size: 10px;
-            }
-            
+            /* Перемещаем кнопки в верхнюю строку, но без наложения */
             .button-support {
-                top: 10px;
-                right: 10px;
+                top: 15px;
+                right: 15px;
+                padding: 8px 15px;
+                font-size: 12px;
             }
             
             .button-login {
-                top: 10px;
-                right: 80px;
+                top: 15px;
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 8px 15px;
+                font-size: 12px;
+                white-space: nowrap;
+                max-width: 120px;
+                text-align: center;
             }
             
             .scroll-down {
-                bottom: 15px;
-                padding: 6px 12px;
-                font-size: 11px;
+                bottom: 20px;
+                padding: 8px 16px;
+                font-size: 12px;
             }
             
             .card {
-                padding: 20px 15px;
+                padding: 30px 20px;
             }
             
             .card-price {
-                font-size: 24px;
+                font-size: 28px;
             }
             
             .examples-grid {
@@ -435,14 +456,75 @@
             }
         }
         
-        /* Для очень маленьких экранов */
+        /* Для очень маленьких экранов (до 480px) */
         @media (max-width: 480px) {
-            .button-login {
-                right: 70px;
+            .hero-title {
+                font-size: 28px;
             }
             
-            .image-button {
-                padding: 4px 8px;
+            .hero-subtitle {
+                font-size: 16px;
+            }
+            
+            .hero-description {
+                font-size: 12px;
+            }
+            
+            .button-support {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+            
+            .button-login {
+                top: 10px;
+                padding: 6px 12px;
+                font-size: 10px;
+                max-width: 100px;
+            }
+            
+            .scroll-down {
+                bottom: 15px;
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+            
+            .card-icon {
+                font-size: 48px;
+            }
+            
+            .card-title {
+                font-size: 22px;
+            }
+            
+            .card-price {
+                font-size: 24px;
+            }
+            
+            .card-features li {
+                font-size: 14px;
+            }
+            
+            .example-title {
+                font-size: 20px;
+            }
+            
+            .example-description {
+                font-size: 12px;
+            }
+        }
+        
+        /* Для совсем крошечных экранов */
+        @media (max-width: 360px) {
+            .button-login {
+                max-width: 80px;
+                padding: 5px 8px;
+                font-size: 9px;
+            }
+            
+            .button-support {
+                padding: 5px 8px;
                 font-size: 9px;
             }
             
@@ -455,7 +537,7 @@
             }
             
             .hero-description {
-                font-size: 12px;
+                font-size: 11px;
             }
         }
     </style>

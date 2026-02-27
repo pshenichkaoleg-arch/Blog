@@ -1,5 +1,6 @@
 import os
 import secrets
+import threading
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
@@ -7,6 +8,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
+from flask_mail import Mail, Message
 
 # Загружаем переменные окружения из .env
 load_dotenv()
@@ -18,16 +20,36 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///blog.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_NAME'] = 'myblog_session'
-app.config['SESSION_COOKIE_SECURE'] = False  # В продакшене с HTTPS должно быть True
+app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+# ==================== НАСТРОЙКИ ПОЧТЫ (MAIL.RU) ====================
+# Прописываем напрямую для надёжности
+app.config['MAIL_SERVER'] = 'smtp.mail.ru'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'pshenichka.oleg@mail.ru'
+app.config['MAIL_PASSWORD'] = '7QtaWPZC4Q1JOBHceaTG'  # ВСТАВЬТЕ СЮДА ПАРОЛЬ!
+app.config['MAIL_DEFAULT_SENDER'] = 'pshenichka.oleg@mail.ru'
+
+print("=== НАСТРОЙКИ ПОЧТЫ ===")
+print(f"MAIL_SERVER: {app.config['MAIL_SERVER']}")
+print(f"MAIL_USERNAME: {app.config['MAIL_USERNAME']}")
+print(f"MAIL_DEFAULT_SENDER: {app.config['MAIL_DEFAULT_SENDER']}")
+print(f"MAIL_PASSWORD загружен: {'Да' if app.config['MAIL_PASSWORD'] else 'Нет'}")
+print("=======================")
+
+# Инициализация Mail
+mail = Mail(app)
 
 db = SQLAlchemy(app)
 
 # Инициализация Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'email_login'
 login_manager.login_message = 'Пожалуйста, войдите, чтобы увидеть эту страницу.'
 
 # Инициализация Flask-Migrate
@@ -68,7 +90,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=True)  # Может быть NULL для OAuth пользователей
+    password_hash = db.Column(db.String(200), nullable=True)
     google_id = db.Column(db.String(100), unique=True, nullable=True)
     github_id = db.Column(db.String(100), unique=True, nullable=True)
     avatar = db.Column(db.String(200), nullable=True)
@@ -119,13 +141,61 @@ def log_user_action(user, action, details=None):
     db.session.commit()
 
 
+# ==================== ФУНКЦИИ ДЛЯ ОТПРАВКИ ПОЧТЫ ====================
+
+def send_async_email(app, msg):
+    """Отправка email в фоновом потоке"""
+    with app.app_context():
+        try:
+            print(f"📨 Отправка письма на {msg.recipients}...")
+            mail.send(msg)
+            print(f"✅ Письмо успешно отправлено!")
+        except Exception as e:
+            print(f"❌ Ошибка отправки: {str(e)}")
+
+
+def send_support_email(name, email, message):
+    """Отправка письма из формы поддержки"""
+    try:
+        # Явно указываем отправителя
+        msg = Message(
+            subject=f'📬 Новое сообщение в поддержку от {name}',
+            sender='pshenichka.oleg@mail.ru',
+            recipients=['pshenichka.oleg@mail.ru'],
+            reply_to=email
+        )
+        
+        msg.body = f"""
+Новое сообщение от пользователя:
+
+👤 Имя: {name}
+📧 Email: {email}
+💬 Сообщение:
+{message}
+
+---
+Это письмо отправлено автоматически с вашего сайта.
+        """
+        
+        # Отправляем в фоновом потоке
+        thread = threading.Thread(target=send_async_email, args=(app, msg))
+        thread.daemon = True
+        thread.start()
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Ошибка при подготовке письма: {str(e)}")
+        return False
+
+
 # ----------------------------------------------------------------------
 # МАРШРУТЫ
 # ----------------------------------------------------------------------
 
 @app.route('/')
 def index():
-    """Главная страница с полноэкранным изображением"""
+    """Главная страница"""
     return render_template('only_image.html')
 
 
@@ -148,8 +218,14 @@ def support():
         name = request.form['name']
         email = request.form['email']
         message = request.form['message']
-        flash('Спасибо за обращение! Мы ответим вам в ближайшее время.', 'success')
+        
+        if send_support_email(name, email, message):
+            flash('✅ Спасибо за обращение! Мы получили ваше сообщение и ответим в ближайшее время.', 'success')
+        else:
+            flash('❌ Произошла ошибка при отправке. Пожалуйста, попробуйте позже.', 'danger')
+        
         return redirect(url_for('support'))
+    
     return render_template('support.html')
 
 
@@ -158,12 +234,6 @@ def support():
 def personal_account():
     """Личный кабинет пользователя"""
     return render_template('personal_account.html')
-
-
-@app.route('/design')
-def design_gallery():
-    """Галерея дизайна и цен"""
-    return render_template('design_gallery.html')
 
 
 @app.route('/post/<int:post_id>')
@@ -176,7 +246,7 @@ def post(post_id):
 @app.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    """Создание нового поста (только для авторизованных)"""
+    """Создание нового поста"""
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
@@ -188,20 +258,6 @@ def create():
         return redirect(url_for('index'))
     return render_template('create.html')
 
-@app.route('/tarif/start')
-def tarif_start():
-    """Страница тарифа Старт"""
-    return render_template('tarif_start.html')
-
-@app.route('/tarif/business')
-def tarif_business():
-    """Страница тарифа Бизнес"""
-    return render_template('tarif_business.html')
-
-@app.route('/tarif/corporate')
-def tarif_corporate():
-    """Страница тарифа Корпоративный"""
-    return render_template('tarif_corporate.html')
 
 @app.route('/logout')
 @login_required
@@ -215,10 +271,9 @@ def logout():
 
 # ==================== OAuth МАРШРУТЫ ====================
 
-# --- Вход через Email (Magic Link) ---
 @app.route('/login/email', methods=['GET', 'POST'])
 def email_login():
-    """Вход через email (простая форма)"""
+    """Вход через email"""
     if request.method == 'POST':
         email = request.form.get('email')
         
@@ -226,12 +281,9 @@ def email_login():
             flash('Введите email', 'danger')
             return redirect(url_for('email_login'))
         
-        # Ищем пользователя по email
         user = User.query.filter_by(email=email).first()
         
         if not user:
-            # Если пользователя нет, создаём нового с этим email
-            # Генерируем username из email
             base_username = email.split('@')[0]
             username = base_username
             counter = 1
@@ -250,7 +302,6 @@ def email_login():
         else:
             flash('Добро пожаловать!', 'success')
         
-        # Входим в систему
         login_user(user)
         log_user_action(user, 'login_email')
         
@@ -259,10 +310,9 @@ def email_login():
     return render_template('email_login.html')
 
 
-# --- Google OAuth ---
 @app.route('/login/google')
 def google_login():
-    """Инициализация входа через Google"""
+    """Вход через Google"""
     if current_user.is_authenticated:
         return redirect(url_for('personal_account'))
     
@@ -292,7 +342,6 @@ def google_callback():
                 user.avatar = picture
                 flash('Ваш аккаунт теперь привязан к Google!', 'success')
             else:
-                # Проверяем уникальность имени
                 base_username = name.replace(' ', '_').lower()
                 username = base_username
                 counter = 1
@@ -322,10 +371,9 @@ def google_callback():
         return redirect(url_for('email_login'))
 
 
-# --- GitHub OAuth ---
 @app.route('/login/github')
 def github_login():
-    """Инициализация входа через GitHub"""
+    """Вход через GitHub"""
     if current_user.is_authenticated:
         return redirect(url_for('personal_account'))
     
@@ -339,7 +387,6 @@ def github_callback():
     try:
         token = github.authorize_access_token()
         
-        # Получаем информацию о пользователе
         resp = github.get('user', token=token)
         user_info = resp.json()
         
@@ -348,7 +395,6 @@ def github_callback():
         name = user_info.get('name') or user_info.get('login')
         avatar = user_info.get('avatar_url')
         
-        # Если email не пришёл, запрашиваем его отдельно
         if not email:
             emails_resp = github.get('user/emails', token=token)
             emails = emails_resp.json()
@@ -373,7 +419,6 @@ def github_callback():
                 user.avatar = avatar
                 flash('Ваш аккаунт теперь привязан к GitHub!', 'success')
             else:
-                # Проверяем уникальность имени
                 base_username = name.replace(' ', '_').lower()
                 username = base_username
                 counter = 1
@@ -403,9 +448,52 @@ def github_callback():
         return redirect(url_for('email_login'))
 
 
-# ----------------------------------------------------------------------
-# ОБРАБОТКА ОШИБОК
-# ----------------------------------------------------------------------
+# ==================== МАРШРУТЫ ДЛЯ ТАРИФОВ ====================
+
+@app.route('/tarif/start')
+def tarif_start():
+    return render_template('tarif_start.html')
+
+@app.route('/tarif/business')
+def tarif_business():
+    return render_template('tarif_business.html')
+
+@app.route('/tarif/corporate')
+def tarif_corporate():
+    return render_template('tarif_corporate.html')
+
+
+# ==================== ТЕСТОВЫЕ МАРШРУТЫ ====================
+
+@app.route('/test-mailru')
+def test_mailru():
+    """Тест Mail.ru почты"""
+    try:
+        msg = Message(
+            subject='✅ Тест Mail.ru',
+            sender='pshenichka.oleg@mail.ru',
+            recipients=['pshenichka.oleg@mail.ru']
+        )
+        msg.body = 'Если вы это читаете — Mail.ru работает!'
+        mail.send(msg)
+        return '✅ Письмо через Mail.ru отправлено! Проверьте почту.'
+    except Exception as e:
+        return f'❌ Ошибка: {str(e)}'
+
+@app.route('/routes')
+def list_routes():
+    """Показать все доступные маршруты"""
+    import urllib
+    output = []
+    for rule in app.url_map.iter_rules():
+        methods = ','.join(rule.methods)
+        line = urllib.parse.unquote(f"{rule.endpoint}: {rule.rule} [{methods}]")
+        output.append(line)
+    return '<br>'.join(output)
+
+
+# ==================== ОБРАБОТЧИКИ ОШИБОК ====================
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
@@ -419,7 +507,7 @@ with app.app_context():
 
 
 # ----------------------------------------------------------------------
-# ЗАПУСК (ТОЛЬКО ДЛЯ ЛОКАЛЬНОЙ РАЗРАБОТКИ)
+# ЗАПУСК
 # ----------------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True)
